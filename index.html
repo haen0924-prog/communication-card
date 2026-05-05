@@ -2331,6 +2331,7 @@ function closeCaptionScreen() {
 
 function clearCaption() {
   finalText = '';
+  lastFinalText = '';
   document.getElementById('captionFinal').textContent = '';
   document.getElementById('captionInterim').textContent = '';
   document.getElementById('captionTranslationResult').classList.remove('show');
@@ -2370,14 +2371,28 @@ function startListening() {
     }
   };
 
+  // 안드로이드 중복 방지용 변수
+  let lastFinalText = '';
+
   recognition.onresult = (event) => {
     let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript;
+      const transcript = event.results[i][0].transcript.trim();
       if (event.results[i].isFinal) {
-        finalText += transcript + ' ';
+        // 안드로이드 중복 방지: 이미 finalText에 포함된 내용이면 무시
+        if (transcript && !finalText.trimEnd().endsWith(transcript)) {
+          finalText += transcript + ' ';
+        }
       } else {
-        interim += transcript;
+        // interim 중복 방지: finalText 끝부분과 겹치는 내용 제거
+        const trimmedFinal = finalText.trim();
+        if (trimmedFinal && transcript.startsWith(trimmedFinal.slice(-Math.min(20, trimmedFinal.length)))) {
+          // 겹치는 부분 제거
+          const overlap = trimmedFinal.slice(-Math.min(20, trimmedFinal.length));
+          interim += transcript.replace(overlap, '').trim();
+        } else {
+          interim += transcript;
+        }
       }
     }
     document.getElementById('captionFinal').textContent = finalText;
@@ -2385,9 +2400,10 @@ function startListening() {
     const el = document.getElementById('captionFinal');
     el.scrollTop = el.scrollHeight;
 
-    // 번역 버튼이 활성화된 상태면 자동 재번역
+    // 번역 버튼이 활성화된 상태면 자동 재번역 (내용 바뀔 때만)
     const activeBtn = document.querySelector('.caption-translate-btn.active');
-    if (activeBtn && finalText.trim()) {
+    if (activeBtn && finalText.trim() && finalText !== lastFinalText) {
+      lastFinalText = finalText;
       handleCaptionTranslate(activeBtn.dataset.lang, activeBtn);
     }
   };
