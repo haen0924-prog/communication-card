@@ -2350,14 +2350,12 @@ function renderCards() {
     grid.innerHTML = cards[cat]
       .map(([emoji, text], originalIndex) => {
         if (isHidden(cat, text)) return '';
-        const safeText = text.replace(/'/g, "&#39;");
         return `<div class="card"
-          onclick="showCard('${emoji}', '${safeText}', ${catIndex}, ${originalIndex})"
           oncontextmenu="return false"
           data-cat="${cat}"
           data-cat-index="${catIndex}"
           data-card-index="${originalIndex}"
-          data-text="${text.replace(/"/g,'&quot;')}"
+          data-text="${text.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"
           data-emoji="${emoji}">
           <span class="card-emoji">${emoji}</span>
           <span class="card-text">${text}</span>
@@ -2366,6 +2364,15 @@ function renderCards() {
 
 
     grid.querySelectorAll('.card').forEach(card => {
+      // click → showCard (data 속성에서 안전하게 읽기)
+      card.addEventListener('click', () => {
+        const emoji = card.dataset.emoji;
+        const text = card.dataset.text;
+        const catIndex = parseInt(card.dataset.catIndex);
+        const cardIndex = parseInt(card.dataset.cardIndex);
+        showCard(emoji, text, catIndex, cardIndex);
+      });
+
       let pressTimer;
       card.addEventListener('touchstart', e => {
         card.classList.add('pressing');
@@ -2862,13 +2869,26 @@ function renderFavorites() {
   }
   bar.style.display = '';
   chips.innerHTML = favoriteItems.map((item, i) => {
-    const safeText = item.text.replace(/'/g, "\'");
-    return `<div class="saved-chip" onclick="showCard('${item.emoji}', '${item.text.replace(/'/g,'&#39;')}')" style="border-color:#fcd34d; background:#fffbeb;">
+    return `<div class="saved-chip fav-chip" data-index="${i}" data-emoji="${item.emoji.replace(/"/g,'&quot;')}" data-text="${item.text.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" style="border-color:#fcd34d; background:#fffbeb;">
       <span>${item.emoji}</span>
       <span style="font-weight:700">${item.text}</span>
-      <span class="del-btn" onclick="event.stopPropagation(); deleteFavorite(${i})">×</span>
+      <span class="del-btn fav-del" data-index="${i}">×</span>
     </div>`;
   }).join('');
+
+  // 이벤트 바인딩
+  chips.querySelectorAll('.fav-chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      if (e.target.classList.contains('fav-del')) return;
+      showCard(chip.dataset.emoji, chip.dataset.text);
+    });
+  });
+  chips.querySelectorAll('.fav-del').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteFavorite(parseInt(btn.dataset.index));
+    });
+  });
 }
 
 function deleteCustom(i) {
@@ -2886,12 +2906,25 @@ function renderSaved() {
   }
   section.style.display = '';
   container.innerHTML = savedItems.map((item, i) => `
-    <div class="saved-chip" onclick="showCard('${item.emoji}', '${item.text.replace(/'/g,"\\'")}')">
+    <div class="saved-chip custom-chip" data-index="${i}" data-emoji="${item.emoji.replace(/"/g,'&quot;')}" data-text="${item.text.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">
       <span>${item.emoji}</span>
       <span>${item.text}</span>
-      <span class="del-btn" onclick="event.stopPropagation(); deleteCustom(${i})">×</span>
+      <span class="del-btn custom-del" data-index="${i}">×</span>
     </div>
   `).join('');
+
+  container.querySelectorAll('.custom-chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      if (e.target.classList.contains('custom-del')) return;
+      showCard(chip.dataset.emoji, chip.dataset.text);
+    });
+  });
+  container.querySelectorAll('.custom-del').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteCustom(parseInt(btn.dataset.index));
+    });
+  });
 }
 
 // 글씨 크기 설정
