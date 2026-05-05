@@ -2350,7 +2350,7 @@ function renderCards() {
     grid.innerHTML = cards[cat]
       .map(([emoji, text], originalIndex) => {
         if (isHidden(cat, text)) return '';
-        const safeText = text.replace(/'/g, "\'");
+        const safeText = text.replace(/'/g, "&#39;");
         return `<div class="card"
           onclick="showCard('${emoji}', '${safeText}', ${catIndex}, ${originalIndex})"
           oncontextmenu="return false"
@@ -2710,8 +2710,11 @@ function setVoice(mode) {
 
 // ── 카드 표시 모달 ──────────────────────────
 function showCard(emoji, text, catIndex, cardIndex) {
+  // &#39; 등 HTML 엔티티 디코드
+  const decoded = text.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&');
   document.getElementById('modalEmoji').textContent = emoji;
-  document.getElementById('modalText').textContent = text;
+  document.getElementById('modalText').textContent = decoded;
+  text = decoded;
   document.getElementById('btnSpeak').style.display = voiceEnabled ? 'block' : 'none';
 
   // 카드 위치 저장 (카드 클릭이면 저장, 직접입력이면 null)
@@ -2860,7 +2863,7 @@ function renderFavorites() {
   bar.style.display = '';
   chips.innerHTML = favoriteItems.map((item, i) => {
     const safeText = item.text.replace(/'/g, "\'");
-    return `<div class="saved-chip" onclick="showCard('${item.emoji}', '${safeText}')" style="border-color:#fcd34d; background:#fffbeb;">
+    return `<div class="saved-chip" onclick="showCard('${item.emoji}', '${item.text.replace(/'/g,'&#39;')}')" style="border-color:#fcd34d; background:#fffbeb;">
       <span>${item.emoji}</span>
       <span style="font-weight:700">${item.text}</span>
       <span class="del-btn" onclick="event.stopPropagation(); deleteFavorite(${i})">×</span>
