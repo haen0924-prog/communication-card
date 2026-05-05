@@ -2208,10 +2208,10 @@ function buildCaptionTranslateBtns() {
 // 자막 번역 실행
 async function handleCaptionTranslate(targetLang, btn) {
   const captionText = document.getElementById('captionFinal').textContent.trim();
-  const placeholderTexts = Object.values(uiText).map(u => u.captionPlaceholder);
-  if (!captionText || placeholderTexts.includes(captionText)) {
-    return;
-  }
+
+  // 자막 내용이 없거나 placeholder인 경우 무시
+  const isPlaceholder = Object.values(uiText).some(u => u.captionPlaceholder === captionText);
+  if (!captionText || isPlaceholder) return;
 
   // 같은 버튼 다시 누르면 닫기
   if (btn.classList.contains('active')) {
@@ -2220,6 +2220,7 @@ async function handleCaptionTranslate(targetLang, btn) {
     return;
   }
 
+  // 다른 버튼 모두 비활성화
   document.querySelectorAll('.caption-translate-btn').forEach(b => b.classList.remove('active', 'loading'));
   btn.classList.add('active', 'loading');
 
@@ -2227,18 +2228,57 @@ async function handleCaptionTranslate(targetLang, btn) {
   const resultText = document.getElementById('captionTranslationText');
   const resultLang = document.getElementById('captionTranslationLang');
 
-  resultText.innerHTML = '<span style="color:#94a3b8">번역 중...</span>';
+  resultText.innerHTML = '<span style="color:#94a3b8;font-size:16px">번역 중...</span>';
   resultBox.classList.add('show');
 
   try {
-    const translated = await translateWithClaude(captionText, targetLang);
+    const translated = await translateCaption(captionText, targetLang);
     resultLang.textContent = langInfo[targetLang].flag + ' ' + langInfo[targetLang].name;
     resultText.textContent = translated;
     btn.classList.remove('loading');
   } catch (e) {
-    resultText.textContent = '번역 오류';
+    resultText.textContent = '번역 중 오류가 발생했어요. 다시 시도해주세요.';
     btn.classList.remove('active', 'loading');
   }
+}
+
+// 자막 자동 재번역 (버튼 토글 없이 결과만 업데이트)
+async function autoTranslateCaption(targetLang) {
+  const captionText = document.getElementById('captionFinal').textContent.trim();
+  const isPlaceholder = Object.values(uiText).some(u => u.captionPlaceholder === captionText);
+  if (!captionText || isPlaceholder) return;
+
+  const resultBox = document.getElementById('captionTranslationResult');
+  const resultText = document.getElementById('captionTranslationText');
+  const resultLang = document.getElementById('captionTranslationLang');
+
+  resultBox.classList.add('show');
+  try {
+    const translated = await translateCaption(captionText, targetLang);
+    resultLang.textContent = langInfo[targetLang].flag + ' ' + langInfo[targetLang].name;
+    resultText.textContent = translated;
+  } catch (e) {
+    // 자동 재번역 실패는 조용히 무시
+  }
+}
+
+// 자막 전용 번역 - 언어 자동 감지 (상대방 언어를 모르므로 auto 사용)
+async function translateCaption(text, targetLang) {
+  const cacheKey = 'caption__' + text + '__' + targetLang;
+  if (translateCache[cacheKey]) return translateCache[cacheKey];
+
+  const langCode = { ko: 'ko', en: 'en', ja: 'ja', zh: 'zh-CN', es: 'es', fr: 'fr', de: 'de' };
+  const to = langCode[targetLang];
+
+  // 자막 소스 언어 기반 번역
+  const from = langCode[captionSourceLang] || 'ko';
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + from + '|' + to;
+  const response = await fetch(url);
+  const data = await response.json();
+
+  const result = data?.responseData?.translatedText?.trim() || text;
+  translateCache[cacheKey] = result;
+  return result;
 }
 
 // 언어 전환
@@ -2545,6 +2585,7 @@ function applyEmojiMode() {
 let recognition = null;
 let isListening = false;
 let finalText = '';
+let captionSourceLang = 'ko'; // 자막 음성인식 언어
 
 function updateCaptionSize(val) {
   document.getElementById('captionScreen').style.setProperty('--caption-font-size', val + 'px');
@@ -2597,6 +2638,7 @@ function startListening() {
   recognition = new SpeechRecognition();
   const langMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' };
   recognition.lang = langMap[currentLang] || 'ko-KR';
+  captionSourceLang = currentLang; // 자막 소스 언어 저장
   recognition.continuous = true;
   recognition.interimResults = true;
 
@@ -2645,7 +2687,7 @@ function startListening() {
     const activeBtn = document.querySelector('.caption-translate-btn.active');
     if (activeBtn && finalText.trim() && finalText !== lastFinalText) {
       lastFinalText = finalText;
-      handleCaptionTranslate(activeBtn.dataset.lang, activeBtn);
+      autoTranslateCaption(activeBtn.dataset.lang);
     }
   };
 
