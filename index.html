@@ -1,0 +1,2670 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>빠른 의사소통 카드</title>
+
+<!-- 앱 아이콘 -->
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="의사소통 카드">
+<meta name="theme-color" content="#0ea5e9">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  /* ===== 실시간 자막 전체화면 ===== */
+  .caption-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 8000;
+    background: #0f172a;
+    flex-direction: column;
+  }
+  .caption-screen.show { display: flex; animation: fadeIn 0.2s ease; }
+
+  .caption-modal {
+    background: #0f172a;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .caption-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 14px;
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+    flex-shrink: 0;
+  }
+
+  .caption-header-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .caption-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+
+  .caption-status .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: blink 1s infinite;
+  }
+  .caption-status .dot.off { background: #475569; animation: none; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .caption-close-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid #475569;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .caption-close-btn:active { background: #334155; }
+
+  /* 자막 표시 영역 */
+  .caption-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 28px 24px;
+    overflow: hidden;
+  }
+
+  .caption-final {
+    font-size: var(--caption-font-size, 52px);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.4;
+    text-align: center;
+    word-break: keep-all;
+    max-height: 60vh;
+    overflow-y: auto;
+    width: 100%;
+    transition: font-size 0.15s;
+  }
+
+  .caption-interim {
+    font-size: calc(var(--caption-font-size, 52px) * 0.65);
+    font-weight: 600;
+    color: #64748b;
+    line-height: 1.4;
+    text-align: center;
+    min-height: 44px;
+    word-break: keep-all;
+    margin-top: 16px;
+    width: 100%;
+    transition: font-size 0.15s;
+  }
+
+  /* ===== 자막 번역 결과 영역 ===== */
+  .caption-translation-area {
+    padding: 0 20px 12px;
+    background: #0f172a;
+    flex-shrink: 0;
+  }
+  .caption-translation-result {
+    background: #1e3a5f;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: none;
+  }
+  .caption-translation-result.show { display: block; animation: fadeIn 0.2s ease; }
+  .caption-translation-lang-badge {
+    font-size: 12px;
+    color: #38bdf8;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .caption-translation-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.4;
+    word-break: keep-all;
+  }
+  .caption-translation-btns {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 10px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .caption-translate-btn {
+    flex: 1;
+    min-width: 60px;
+    padding: 9px 6px;
+    border-radius: 10px;
+    border: 2px solid #334155;
+    background: #1e293b;
+    color: #94a3b8;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .caption-translate-btn:active { background: #334155; }
+  .caption-translate-btn.active {
+    border-color: #38bdf8;
+    background: rgba(56,189,248,0.15);
+    color: #38bdf8;
+  }
+  .caption-translate-btn.loading { opacity: 0.6; }
+
+  /* 글자 크기 조절 바 */
+  .caption-size-bar {
+    padding: 10px 20px 14px;
+    background: #1e293b;
+    border-top: 1px solid #334155;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .caption-size-label {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .caption-size-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: #334155;
+    outline: none;
+    cursor: pointer;
+  }
+  .caption-size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #4ade80;
+    cursor: pointer;
+    border: 2px solid #0f172a;
+  }
+  .caption-size-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #4ade80;
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* 하단 버튼 바 */
+  .caption-footer {
+    padding: 12px 20px 28px;
+    background: #1e293b;
+    border-top: 1px solid #334155;
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .btn-caption-toggle {
+    flex: 1;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    background: #4ade80;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-caption-toggle.listening {
+    background: #f87171;
+    color: #fff;
+  }
+  .btn-caption-toggle:active { opacity: 0.85; }
+
+  .btn-caption-clear {
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 2px solid #475569;
+    background: transparent;
+    color: #94a3b8;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-caption-clear:active { background: #1e293b; }
+
+  /* 자막 실행 버튼 */
+  .caption-launch-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 2px solid #4ade80;
+    background: rgba(74,222,128,0.08);
+    color: #16a34a;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .caption-launch-btn:active { background: rgba(74,222,128,0.2); }
+
+
+
+
+  .version-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--bg);
+    overflow-y: auto;
+    padding: 32px 16px 40px;
+  }
+  .version-overlay.show { display: block; animation: fadeIn 0.2s ease; }
+
+  .version-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .version-subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+  }
+
+  .version-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .version-card {
+    background: var(--surface);
+    border: 3px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .version-card:active { transform: scale(0.97); }
+  .version-card.selected { border-color: var(--accent2); }
+
+  .version-card-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* 미리보기 카드 그리드 */
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .preview-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .preview-card .pe { font-size: 26px; line-height: 1; }
+  .preview-card .pt { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.3; }
+
+  .version-lang-bar {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .version-lang-btn {
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 2px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .version-lang-btn.active {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #fff;
+  }
+  .version-lang-btn:active { opacity: 0.8; }
+
+
+  .btn-select-version {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 50px;
+    border: none;
+    background: #1a237e;
+    color: #ffe600;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s;
+  }
+  .btn-select-version:active { opacity: 0.8; }
+
+  /* 헤더 버전 변경 버튼 */
+  .btn-change-version {
+    margin-top: 6px;
+    padding: 4px 12px;
+    border-radius: 50px;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-change-version:active { background: rgba(255,255,255,0.15); }
+
+
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --card: #ffffff;
+    --accent: #0284c7;
+    --accent2: #db2777;
+    --accent3: #16a34a;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #cbd5e1;
+    --radius: 16px;
+    --card-text-size: 13px;
+    --card-emoji-size: 36px;
+    --card-min-height: 100px;
+  }
+
+  /* 카드 라이트 스타일 */
+  .card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-color: #e2e8f0;
+  }
+  .card:active {
+    background: #e0f2fe;
+    border-color: var(--accent);
+  }
+
+  /* ===== 큰 글씨 모드 ===== */
+  body.font-lg {
+    --card-text-size: 17px;
+    --card-emoji-size: 44px;
+    --card-min-height: 130px;
+  }
+
+  body.font-lg .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  body.font-lg .section-title {
+    font-size: 19px;
+  }
+
+  body.font-lg .tab {
+    font-size: 13px;
+    padding: 7px 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  header {
+    background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #ec4899 100%);
+    padding: 14px 16px 10px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  header h1 {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    font-size: 12px;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  /* 설정 바 */
+  .settings-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .settings-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .toggle-group {
+    display: flex;
+    gap: 4px;
+    background: var(--bg);
+    border-radius: 50px;
+    padding: 3px;
+    border: 1px solid var(--border);
+  }
+
+  .toggle-btn {
+    padding: 5px 14px;
+    border-radius: 50px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .toggle-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+  }
+
+  .search-bar {
+    padding: 12px 16px;
+    background: var(--surface);
+    position: sticky;
+    top: 72px;
+    z-index: 99;
+  }
+
+  .search-bar input {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 50px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-bar input:focus {
+    border-color: var(--accent);
+  }
+
+  .search-bar input::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* 카테고리 탭 */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 12px;
+    background: var(--surface);
+    justify-content: center;
+  }
+
+  .tab {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    border-radius: 50px;
+    border: 2px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  /* 카테고리 섹션 */
+  .section {
+    padding: 16px 16px 8px;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent);
+  }
+
+  .section-title .emoji {
+    font-size: 22px;
+  }
+
+  /* 카드 그리드 */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px 12px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+    min-height: var(--card-min-height);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 60%, rgba(56,189,248,0.05));
+    pointer-events: none;
+  }
+
+  .card:active {
+    transform: scale(0.96);
+    border-color: var(--accent);
+    background: #e0f2fe;
+  }
+
+  .card .card-emoji {
+    font-size: var(--card-emoji-size);
+    line-height: 1;
+  }
+
+  .card .card-text {
+    font-size: var(--card-text-size);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  /* 큰 카드 표시 모달 */
+  .display-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    cursor: pointer;
+  }
+
+  .display-modal.show {
+    display: flex;
+    animation: fadeIn 0.15s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .display-card {
+    background: white;
+    border-radius: 24px;
+    padding: 48px 20px 28px;
+    text-align: center;
+    max-width: 95vw;
+    width: 100%;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+  }
+
+  /* 모달 닫기 X 버튼 */
+  .modal-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .modal-close-btn:active {
+    background: #334155;
+    color: #f1f5f9;
+  }
+
+  .display-card { position: relative; }
+
+  .display-card .big-emoji {
+    font-size: 120px;
+    line-height: 1;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .display-card .big-text {
+    font-size: 25px;
+    font-weight: 500;
+    color: #0f172a;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    word-break: keep-all;
+  }
+
+  .display-card .tap-hint {
+    font-size: 13px;
+    color: #94a3b8;
+  }
+
+  /* ===== 모달 번역 버튼 영역 ===== */
+  .modal-translate-section {
+    margin-top: 14px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 14px;
+  }
+  .modal-translate-label {
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .modal-translate-btns {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .modal-translate-btn {
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 2px solid #cbd5e1;
+    background: transparent;
+    color: #475569;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-translate-btn:active { opacity: 0.75; }
+  .modal-translate-btn.active {
+    border-color: #0284c7;
+    background: #eff6ff;
+    color: #0284c7;
+  }
+  .modal-translate-btn.loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  /* 번역 결과 박스 */
+  .modal-translation-box {
+    display: none;
+    margin-top: 12px;
+    background: #f0f9ff;
+    border: 2px solid #bae6fd;
+    border-radius: 14px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .modal-translation-box.show { display: block; animation: fadeIn 0.2s ease; }
+  .modal-translation-lang {
+    font-size: 11px;
+    color: #0284c7;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .modal-translation-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.4;
+    word-break: keep-all;
+  }
+  .modal-translation-speak-btn {
+    margin-top: 10px;
+    padding: 7px 20px;
+    border-radius: 50px;
+    border: 2px solid #0284c7;
+    background: transparent;
+    color: #0284c7;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-translation-speak-btn:active { background: #eff6ff; }
+
+  /* 직접 입력 섹션 */
+  .custom-section {
+    padding: 16px;
+    margin: 8px 16px 16px;
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 2px dashed var(--border);
+  }
+
+  .custom-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .custom-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .custom-input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .custom-inputs input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .custom-inputs input:focus {
+    border-color: var(--accent2);
+  }
+
+  .custom-inputs input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .emoji-input {
+    width: 60px !important;
+    flex: none !important;
+    text-align: center;
+    font-size: 22px !important;
+  }
+
+  .btn-show {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent2);
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-show:active { opacity: 0.8; }
+
+  /* 저장된 커스텀 카드들 */
+  .saved-custom {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .saved-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 50px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .saved-chip:active {
+    border-color: var(--accent2);
+  }
+
+  .saved-chip .del-btn {
+    color: var(--text-muted);
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 2px;
+  }
+
+  .hidden { display: none !important; }
+
+  /* 직접입력 버튼 (상단 고정) */
+  .quick-input-bar {
+    padding: 10px 14px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .quick-input-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 2px dashed var(--accent2);
+    background: rgba(244,114,182,0.08);
+    color: var(--accent2);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: -0.3px;
+  }
+
+  .quick-input-btn:active {
+    background: rgba(244,114,182,0.2);
+    transform: scale(0.98);
+  }
+
+  body.light .quick-input-btn {
+    background: rgba(219,39,119,0.06);
+  }
+
+  /* 직접입력 모달 */
+  .input-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1500;
+    justify-content: flex-end;
+    flex-direction: column;
+  }
+
+  .input-modal.show {
+    display: flex;
+    animation: slideUpModal 0.25s ease;
+  }
+
+  @keyframes slideUpModal {
+    from { opacity: 0; transform: translateY(60px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .input-modal-box {
+    background: var(--surface);
+    border-radius: 24px 24px 0 0;
+    padding: 20px 16px 36px;
+    border-top: 2px solid var(--border);
+  }
+
+  .input-modal-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 50px;
+    margin: 0 auto 16px;
+  }
+
+  .input-modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .input-modal-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .input-modal input {
+    flex: 1;
+    padding: 13px 16px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-modal input:focus { border-color: var(--accent2); }
+  .input-modal input::placeholder { color: var(--text-muted); }
+
+  .input-modal .emoji-inp {
+    width: 62px;
+    flex: none;
+    text-align: center;
+    font-size: 22px;
+  }
+
+  .input-modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .btn-modal-show {
+    flex: 2;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent2);
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-modal-save {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 2px solid #4ade80;
+    background: transparent;
+    color: #4ade80;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .voice-type-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  /* 모달 음성 재생 버튼 */
+  .btn-speak {
+    display: block;
+    margin: 12px auto 0;
+    padding: 10px 28px;
+    border-radius: 50px;
+    border: 2px solid #38bdf8;
+    background: transparent;
+    color: #38bdf8;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-speak:active { background: rgba(56,189,248,0.15); }
+  .btn-speak.speaking {
+    background: #38bdf8;
+    color: #0f172a;
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  /* 길게 누르기 삭제 팝업 */
+  .context-menu {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    min-width: 200px;
+  }
+
+  .context-menu.show { display: block; animation: fadeIn 0.12s ease; }
+
+  .context-menu-title {
+    padding: 12px 16px 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .context-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+  }
+
+  .context-menu-btn:active { background: var(--card); }
+  .context-menu-btn.danger { color: #f87171; }
+  .context-menu-btn.star { color: #f59e0b; }
+  .context-menu-btn.restore { color: #4ade80; }
+
+  .context-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1999;
+    background: rgba(0,0,0,0.3);
+  }
+  .context-overlay.show { display: block; }
+
+  /* 카드 길게 누를 때 흔들림 효과 */
+  .card.pressing {
+    animation: pressing 0.5s ease forwards;
+  }
+  @keyframes pressing {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.94); }
+    100% { transform: scale(0.96); box-shadow: 0 0 0 3px var(--accent2); }
+  }
+
+  /* ===== 언어 선택 바 ===== */
+  .lang-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .lang-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-right: 2px;
+  }
+  .lang-btn {
+    padding: 5px 14px;
+    border-radius: 50px;
+    border: 2px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .lang-btn.active {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #fff;
+  }
+
+  /* ===== 번역 로딩 스피너 ===== */
+  .translate-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(2,132,199,0.3);
+    border-top-color: #0284c7;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .display-modal { padding: 12px; align-items: center; }
+    .display-card {
+      max-width: 100%;
+      width: 100%;
+      padding: 20px 24px 16px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      border-radius: 18px;
+    }
+    .display-card .big-emoji { font-size: 60px; margin-bottom: 0; flex-shrink: 0; }
+    .display-card .big-text  { font-size: 38px; margin-bottom: 0; }
+    .modal-close-btn { top: 8px; right: 8px; }
+    .btn-speak { margin-top: 0; }
+  }
+
+  .restore-bar {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #1a2e1a;
+    border-top: 1px solid #4ade80;
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    z-index: 500;
+    font-size: 13px;
+  }
+
+  body.light .restore-bar { background: #f0fdf4; border-color: #4ade80; }
+  .restore-bar.show { display: flex; animation: slideUp 0.2s ease; }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .restore-bar span { color: #4ade80; font-weight: 600; }
+  .btn-restore {
+    padding: 6px 14px;
+    border-radius: 50px;
+    border: 2px solid #4ade80;
+    background: transparent;
+    color: #4ade80;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- 버전 선택 화면 -->
+<div class="version-overlay" id="versionOverlay">
+  <div class="version-title" id="versionTitle">🤟 버전을 선택해 주세요</div>
+  <div class="version-subtitle" id="versionSubtitle">언제든지 헤더의 버튼으로 바꿀 수 있어요</div>
+
+  <!-- 언어 선택 -->
+  <div class="version-lang-bar">
+    <button class="version-lang-btn active" id="vlang-ko" onclick="setVersionLang('ko')">🇰🇷 한국어</button>
+    <button class="version-lang-btn" id="vlang-en" onclick="setVersionLang('en')">🇺🇸 English</button>
+    <button class="version-lang-btn" id="vlang-ja" onclick="setVersionLang('ja')">🇯🇵 日本語</button>
+    <button class="version-lang-btn" id="vlang-zh" onclick="setVersionLang('zh')">🇨🇳 中文</button>
+  </div>
+
+  <div class="version-cards">
+
+    <!-- 이모지 있는 버전 -->
+    <div class="version-card" id="vc-emoji">
+      <div class="version-card-title" id="vEmojiTitle">😊 이모지 있는 버전</div>
+      <div class="preview-grid" id="preview-emoji-grid">
+        <div class="preview-card"><span class="pe">📋</span><span class="pt" id="prev-e-0">메뉴판 보여주세요</span></div>
+        <div class="preview-card"><span class="pe">💳</span><span class="pt" id="prev-e-1">카드로 결제할게요</span></div>
+        <div class="preview-card"><span class="pe">👂🚫</span><span class="pt" id="prev-e-2">저는 청각장애인입니다</span></div>
+        <div class="preview-card"><span class="pe">🙏</span><span class="pt" id="prev-e-3">감사합니다</span></div>
+      </div>
+      <button class="btn-select-version" onclick="selectVersion('emoji')" id="vBtnEmoji">선택</button>
+    </div>
+
+    <!-- 이모지 없는 버전 -->
+    <div class="version-card" id="vc-text">
+      <div class="version-card-title" id="vTextTitle">📝 이모지 없는 버전</div>
+      <div class="preview-grid" id="preview-text-grid">
+        <div class="preview-card" style="min-height:58px"><span class="pt" style="font-size:12px;font-weight:700" id="prev-t-0">메뉴판 보여주세요</span></div>
+        <div class="preview-card" style="min-height:58px"><span class="pt" style="font-size:12px;font-weight:700" id="prev-t-1">카드로 결제할게요</span></div>
+        <div class="preview-card" style="min-height:58px"><span class="pt" style="font-size:12px;font-weight:700" id="prev-t-2">저는 청각장애인입니다</span></div>
+        <div class="preview-card" style="min-height:58px"><span class="pt" style="font-size:12px;font-weight:700" id="prev-t-3">감사합니다</span></div>
+      </div>
+      <button class="btn-select-version" onclick="selectVersion('text')" id="vBtnText">선택</button>
+    </div>
+
+  </div>
+</div>
+
+<header>
+  <h1 id="headerTitle">🤟 빠른 의사소통 카드</h1>
+  <button class="btn-change-version" id="btnChangeVersion" onclick="openVersionSelect()">버전 변경</button>
+</header>
+
+<!-- 설정 바 -->
+<div class="settings-bar">
+  <span class="settings-label" id="labelFont">🔤 글씨</span>
+  <div class="toggle-group">
+    <button class="toggle-btn active" id="btn-sm" onclick="setFont('sm')">작게</button>
+    <button class="toggle-btn" id="btn-lg" onclick="setFont('lg')">크게</button>
+  </div>
+  <div class="divider"></div>
+  <span class="settings-label" id="labelVoice">🔊 음성</span>
+  <div class="toggle-group">
+    <button class="toggle-btn" id="btn-voice-on" onclick="setVoice('on')">켜기</button>
+    <button class="toggle-btn active" id="btn-voice-off" onclick="setVoice('off')">끄기</button>
+  </div>
+</div>
+
+<!-- 언어 선택 바 -->
+<div class="lang-bar">
+  <span class="lang-label" id="labelLang">🌐 언어</span>
+  <button class="lang-btn active" id="lang-ko" onclick="setLang('ko')">🇰🇷 한국어</button>
+  <button class="lang-btn" id="lang-en" onclick="setLang('en')">🇺🇸 English</button>
+  <button class="lang-btn" id="lang-ja" onclick="setLang('ja')">🇯🇵 日本語</button>
+  <button class="lang-btn" id="lang-zh" onclick="setLang('zh')">🇨🇳 中文</button>
+</div>
+
+<div class="quick-input-bar">
+  <button class="quick-input-btn" id="btnQuickInput" onclick="openInputModal()">
+    ✏️ 직접 입력해서 보여주기
+  </button>
+</div>
+
+<div style="padding: 0 14px 10px;">
+  <button class="caption-launch-btn" id="btnCaptionLaunch" onclick="openCaptionScreen()">
+    🎙️ 상대방 말 실시간 자막으로 보기
+  </button>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="🔍 카드 검색..." oninput="filterCards()">
+</div>
+
+<!-- 자주 쓰는 카드 영역 -->
+<div id="favoriteBar" style="display:none; padding: 10px 14px 4px; background: var(--surface); border-bottom: 1px solid var(--border);">
+  <div id="favoriteTitleEl" style="font-size:12px; font-weight:700; color:#f59e0b; margin-bottom:8px;">⭐ 자주 쓰는 카드</div>
+  <div id="favoriteChips" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+</div>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" id="tabAll" onclick="filterTab('all', this)">전체</button>
+  <button class="tab" onclick="filterTab('소통', this)">💬 소통</button>
+  <button class="tab" onclick="filterTab('카페', this)">☕ 카페</button>
+  <button class="tab" onclick="filterTab('식당', this)">🍽️ 식당</button>
+  <button class="tab" onclick="filterTab('쇼핑', this)">🛒 쇼핑</button>
+  <button class="tab" onclick="filterTab('병원', this)">🏥 병원</button>
+  <button class="tab" onclick="filterTab('교통', this)">🚌 교통</button>
+  <button class="tab" onclick="filterTab('학교', this)">🎓 학교</button>
+  <button class="tab" onclick="filterTab('직장', this)">💼 직장</button>
+  <button class="tab" onclick="filterTab('숙박', this)">🏨 숙박</button>
+  <button class="tab" onclick="filterTab('은행', this)">🏦 은행</button>
+  <button class="tab" onclick="filterTab('관공서', this)">🏛️ 관공서</button>
+  <button class="tab" onclick="filterTab('긴급', this)">🚨 긴급</button>
+</div>
+
+<div id="allContent">
+</div>
+
+
+<!-- 실시간 자막 모달 -->
+<div class="caption-screen" id="captionScreen" onclick="closeCaptionScreen()">
+  <div class="caption-modal" onclick="event.stopPropagation()">
+    <div class="caption-header">
+      <div class="caption-header-title">
+        <span id="captionScreenTitle">🎙️ 실시간 자막</span>
+        <div class="caption-status" id="captionStatus">
+          <span class="dot off" id="captionDot"></span>
+          <span id="captionStatusText">대기 중</span>
+        </div>
+      </div>
+      <button class="caption-close-btn" onclick="closeCaptionScreen()">✕</button>
+    </div>
+
+    <div class="caption-body">
+      <div class="caption-final" id="captionFinal">상대방의 말이 여기에 자막으로 나타납니다</div>
+      <div class="caption-interim" id="captionInterim"></div>
+    </div>
+
+    <!-- ===== 번역 버튼 (자막 화면) ===== -->
+    <div class="caption-translate-btns" id="captionTranslateBtns">
+      <!-- JS로 동적 생성 -->
+    </div>
+    <div class="caption-translation-area">
+      <div class="caption-translation-result" id="captionTranslationResult">
+        <div class="caption-translation-lang-badge" id="captionTranslationLang"></div>
+        <div class="caption-translation-text" id="captionTranslationText"></div>
+      </div>
+    </div>
+
+    <div class="caption-size-bar">
+      <span class="caption-size-label">🔤 글자 크기</span>
+      <input type="range" class="caption-size-slider" id="captionSizeSlider"
+        min="24" max="100" value="52" oninput="updateCaptionSize(this.value)">
+      <span class="caption-size-value" id="captionSizeValue">52px</span>
+    </div>
+
+    <div class="caption-footer">
+      <button class="btn-caption-toggle" id="btnCaptionToggle" onclick="toggleListening()">
+        🎙️ 듣기 시작
+      </button>
+      <button class="btn-caption-clear" id="btnCaptionClear" onclick="clearCaption()">🗑️ 지우기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 직접입력 모달 -->
+<div class="input-modal" id="inputModal" onclick="closeInputModal()">
+  <div class="input-modal-box" onclick="event.stopPropagation()">
+    <div class="input-modal-handle"></div>
+    <div class="input-modal-title" id="inputModalTitle">✏️ 직접 입력해서 보여주기</div>
+    <div class="input-modal-row">
+      <input type="text" class="emoji-inp" id="modalCustomEmoji" placeholder="😊" maxlength="2">
+      <input type="text" id="modalCustomText" placeholder="전하고 싶은 말을 입력하세요..."
+        onkeydown="if(event.key==='Enter') modalShowCustom()">
+    </div>
+    <div class="input-modal-actions">
+      <button class="btn-modal-show" id="btnModalShow" onclick="modalShowCustom()">📢 보여주기</button>
+      <button class="btn-modal-save" id="btnModalSave" onclick="modalSaveCustom()">💾 저장</button>
+      <button class="btn-modal-save" id="btnModalFavorite" onclick="modalFavoriteCustom()" style="border-color:#f59e0b; color:#f59e0b;">⭐ 자주</button>
+    </div>
+  </div>
+</div>
+
+<!-- 큰 화면 표시 모달 -->
+<div class="display-modal" id="modal" onclick="closeModal()">
+  <div class="display-card" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    <span class="big-emoji" id="modalEmoji">🙏</span>
+    <div class="big-text" id="modalText"></div>
+    <button class="btn-speak" id="btnSpeak" onclick="speakModalText()" style="display:none">🔊 다시 듣기</button>
+
+    <!-- ===== 번역 버튼 영역 ===== -->
+    <div class="modal-translate-section">
+      <div class="modal-translate-label" id="modalTranslateLabel">🌐 다른 언어로 보기</div>
+      <div class="modal-translate-btns" id="modalTranslateBtns">
+        <!-- JS로 동적 생성 -->
+      </div>
+      <div class="modal-translation-box" id="modalTranslationBox">
+        <div class="modal-translation-lang" id="modalTranslationLang"></div>
+        <div class="modal-translation-text" id="modalTranslationText"></div>
+        <button class="modal-translation-speak-btn" id="modalTranslationSpeakBtn" onclick="speakTranslation()" style="display:none">🔊 듣기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 길게 누르기 팝업 -->
+<div class="context-overlay" id="ctxOverlay" onclick="closeContextMenu()"></div>
+<div class="context-menu" id="ctxMenu">
+  <div class="context-menu-title" id="ctxTitle">카드 옵션</div>
+  <button class="context-menu-btn" onclick="ctxShow()">👁️ 크게 보여주기</button>
+  <button class="context-menu-btn star" id="ctxFavoriteBtn" onclick="ctxFavorite()">⭐ 자주 쓰는 카드에 추가</button>
+  <button class="context-menu-btn danger" onclick="ctxDelete()">🗑️ 이 카드 숨기기</button>
+</div>
+
+<!-- 복원 바 (카드 숨긴 후 표시) -->
+<div class="restore-bar" id="restoreBar">
+  <span>🗑️ 카드가 숨겨졌어요</span>
+  <button class="btn-restore" onclick="undoDelete()">↩️ 되돌리기</button>
+  <button class="btn-restore" onclick="showHiddenManager()">목록 보기</button>
+</div>
+
+<script>
+// ── 다국어 카드 데이터 ──────────────────────
+const allCards = {
+  ko: {
+    '소통': [
+      ['👂🚫','저는 청각장애인입니다'],['✍️','글로 써주시면 감사해요'],['👍','네'],['👎','아니요'],['🙏','감사합니다'],['😔','죄송합니다'],['🔁','다시 한번 말씀해 주세요'],['🐢','천천히 말씀해 주세요'],['✅','이해했어요'],['❌','이해하지 못했어요'],['✋','잠깐만요'],['😅','잘 못 들었어요, 죄송해요'],['📱','문자로 연락해 주세요'],['📝','종이에 써주세요'],['🤟','수어 통역사를 불러주세요'],['👁️','입 모양을 크게 해주세요'],['🔢','숫자로 알려주세요'],['📸','화면을 보여주세요'],['💬','카카오톡으로 연락해요'],['🤝','잘 부탁드립니다'],
+    ],
+    '카페': [
+      ['☕','아이스 아메리카노 한 잔 주세요'],['🧾','주문할게요'],['💳','카드로 결제할게요'],['📦','테이크아웃이에요'],['🪑','여기서 마실게요 (매장)'],['🧊','얼음 많이 주세요'],['🧊','얼음 빼주세요'],['🍬','설탕 빼주세요'],['🥛','시럽 빼주세요'],['🌡️','따뜻하게 주세요'],['📏','사이즈 업 할게요'],['🔄','리필 되나요?'],['📶','와이파이 비밀번호가 뭔가요?'],['🔌','콘센트 어디 있나요?'],['⏰','얼마나 기다려야 하나요?'],['🧋','버블티 주문할게요'],['🎂','케이크도 있나요?'],['🥤','음료 나왔나요? (진동벨)'],['🗑️','빈 컵 어디에 버려요?'],['🚻','화장실이 어디예요?'],
+    ],
+    '식당': [
+      ['📋','메뉴판 보여주세요'],['👇','이걸로 주문할게요'],['💳','카드로 결제할게요'],['🧾','영수증 주세요'],['📦','포장해 주세요'],['🪑','자리 있나요?'],['💧','물 한 잔 더 주세요'],['🛍️','테이크아웃이에요'],['🌶️','맵지 않게 해주세요'],['⚠️','알레르기가 있어요'],['💵','현금으로 결제할게요'],['🔄','리필 되나요?'],['⏳','기다려야 하나요?'],['🧊','얼음 빼주세요'],['🔥','뜨겁게 해주세요'],['🍬','설탕 빼주세요'],['🥄','수저 더 주세요'],['🧻','냅킨 주세요'],['😋','잘 먹었습니다'],['🔔','직원을 불러주세요'],
+    ],
+    '쇼핑': [
+      ['💰','이거 얼마예요?'],['💳','카드 결제 되나요?'],['🔄','교환하고 싶어요'],['💸','환불하고 싶어요'],['📍','어디에 있나요?'],['📏','다른 사이즈 있나요?'],['🎨','다른 색상 있나요?'],['🛍️','봉투 주세요'],['🧾','영수증 주세요'],['🏷️','세일 중인가요?'],['📦','재고 있나요?'],['⭐','할인카드 있어요'],['📱','포인트 적립해 주세요'],['🎁','선물 포장 해주세요'],['🔍','이 상품 찾고 있어요'],['💲','더 저렴한 것 있나요?'],['🔖','이거 품절인가요?'],['🪞','탈의실 어디 있나요?'],['🅿️','주차장 어디 있나요?'],['🚻','화장실이 어디예요?'],
+    ],
+    '병원': [
+      ['👂🚫','저는 청각장애인입니다'],['✍️','글로 써주세요'],['📅','예약했어요'],['🤕','여기가 아파요'],['💊','이 약 주세요'],['🆘','응급상황이에요!'],['📄','처방전이 있어요'],['🤟','수어 통역사 연결해 주세요'],['💰','진료비가 얼마예요?'],['📅','다음 예약은 언제인가요?'],['⚠️','알레르기가 있어요'],['😨','부작용이 있어요'],['👨‍👩‍👧','보호자를 불러주세요'],['❓','하루 몇 번 먹나요?'],['🍽️','식전/식후 먹나요?'],['🩺','어느 과에 가야 하나요?'],['📋','진단서 발급해 주세요'],['💉','주사 맞아야 하나요?'],['🚑','구급차 불러주세요'],['📞','문자로 결과 알려주세요'],
+    ],
+    '교통': [
+      ['🗺️','여기 가고 싶어요'],['🚕','택시 불러주세요'],['🛑','여기서 세워주세요'],['⏱️','얼마나 걸리나요?'],['💳','카드 결제 되나요?'],['🚌','이 버스 여기 가나요?'],['📍','다음 정류장이 어디예요?'],['🚇','지하철역이 어디예요?'],['🔄','환승해야 하나요?'],['📍','이 주소로 가주세요'],['🧳','트렁크 열어주세요'],['⚡','빨리 가주세요 (급해요)'],['🧾','영수증 주세요'],['😟','길을 잃었어요'],['🚇','몇 호선 타야 하나요?'],['🎫','교통카드 충전하고 싶어요'],['♿','장애인 좌석 어디 있나요?'],['✈️','공항 가는 버스 있나요?'],['📱','카카오택시 불러주세요'],['🚻','화장실이 어디예요?'],
+    ],
+    '학교': [
+      ['👂🚫','저는 청각장애인입니다'],['✍️','글로 써주시면 감사해요'],['🤟','수어 통역사 지원이 필요해요'],['📋','과제 제출하러 왔어요'],['📅','상담 예약하고 싶어요'],['📝','출석 확인해 주세요'],['🏫','담당 선생님을 만나고 싶어요'],['📖','교재를 빌리고 싶어요'],['🖥️','자막/속기 지원 받을 수 있나요?'],['🎧','보청기 착용 중이에요'],['📚','도서관이 어디예요?'],['🖨️','프린터 사용하고 싶어요'],['📅','시험 일정이 언제예요?'],['🏥','보건실이 어디예요?'],['🍱','급식실이 어디예요?'],['🚌','통학버스 정보 알고 싶어요'],['📋','성적표 받고 싶어요'],['🎓','장학금 신청하고 싶어요'],['📞','긴급 연락처 알려주세요'],['🚻','화장실이 어디예요?'],
+    ],
+    '직장': [
+      ['👂🚫','저는 청각장애인입니다'],['✍️','글로 써주시면 감사해요'],['🤟','수어 통역사 지원이 필요해요'],['📋','회의 내용을 문자로 공유해 주세요'],['💻','이메일로 보내주세요'],['📅','일정을 확인하고 싶어요'],['📝','업무 지시를 메모로 주세요'],['🖥️','자막/속기 지원 있나요?'],['🔔','알림이 안 들려요, 문자로 해주세요'],['📊','자료를 화면으로 보여주세요'],['🤝','처음 뵙겠습니다'],['👋','오늘 퇴근할게요'],['🏠','재택근무 가능한가요?'],['📅','연차 신청하고 싶어요'],['💰','급여 관련 문의드려요'],['🖨️','프린터가 어디 있나요?'],['☕','구내식당이 어디예요?'],['🚻','화장실이 어디예요?'],['🅿️','주차 등록하고 싶어요'],['♿','장애인 편의시설이 어디 있나요?'],
+    ],
+    '숙박': [
+      ['🏨','체크인 하고 싶어요'],['🚪','체크아웃 하고 싶어요'],['👤','예약자 이름을 알려드릴게요'],['🔑','방 열쇠가 안 돼요'],['📶','와이파이 연결 방법을 알려주세요'],['🛁','수건 더 주세요'],['💼','짐 맡아주세요'],['📱','문자로 알려주세요 (모닝콜 대신)'],['🤫','조용히 해주세요'],['🍜','이 근처 맛집 추천해주세요'],['🧹','청소해 주세요'],['🔌','콘센트 위치가 어디예요?'],['❄️','에어컨 조절이 안 돼요'],['🔥','난방이 안 돼요'],['🛏️','침대 시트 교체해 주세요'],['🪥','칫솔/치약 주세요'],['🧴','샴푸/린스 더 주세요'],['📺','TV가 안 켜져요'],['🅿️','주차장 이용할 수 있나요?'],['🌅','조식 몇 시에 시작해요?'],
+    ],
+    '은행': [
+      ['👂🚫','저는 청각장애인입니다'],['✍️','글로 써서 소통해도 될까요?'],['💰','입금/출금하고 싶어요'],['💳','통장 만들고 싶어요'],['🔢','번호표 어디서 뽑나요?'],['📝','서류 작성 도움이 필요해요'],['🤟','수어 통역 서비스 있나요?'],['💸','계좌이체 하고 싶어요'],['🔒','비밀번호를 잊어버렸어요'],['💳','카드를 분실했어요'],['🏠','대출 상담하고 싶어요'],['📊','잔액 조회하고 싶어요'],['📄','거래내역서 출력해 주세요'],['💱','환전하고 싶어요'],['📱','모바일 뱅킹 등록하고 싶어요'],['📋','공과금 납부하고 싶어요'],['🏧','ATM 기계가 어디 있나요?'],['🔐','인터넷 뱅킹 비밀번호 초기화'],['🐢','천천히 써주세요'],['🙋','담당자를 바꿔주세요'],
+    ],
+    '관공서': [
+      ['👂🚫','저는 청각장애인입니다'],['✍️','글로 써주시면 감사해요'],['🤟','수어 통역사를 불러주세요'],['📋','주민등록등본 발급해 주세요'],['🪪','신분증을 가져왔어요'],['🔢','번호표 어디서 뽑나요?'],['📝','이 서류 작성 도와주세요'],['♿','장애인 복지 서비스 신청하고 싶어요'],['🏠','전입신고 하고 싶어요'],['💰','기초생활수급 신청하고 싶어요'],['📄','가족관계증명서 발급해 주세요'],['🏥','장애인 의료비 지원 신청하고 싶어요'],['🚌','장애인 교통비 지원 받고 싶어요'],['📋','인감증명서 발급해 주세요'],['🎓','장애인 교육 지원 받고 싶어요'],['📱','장애인 통신요금 감면 신청해요'],['💳','장애인 카드 재발급해 주세요'],['🏛️','어느 창구로 가야 하나요?'],['⏳','얼마나 기다려야 하나요?'],['📅','예약하고 싶어요'],
+    ],
+    '긴급': [
+      ['🆘','도와주세요!'],['⚡','응급상황이에요!'],['🚒','119에 전화해 주세요'],['🚔','112에 전화해 주세요'],['👂🚫','저는 청각장애인입니다'],['🚑','구급차 불러주세요'],['😟','길을 잃었어요'],['👛','지갑을 잃어버렸어요'],['📱','핸드폰을 잃어버렸어요'],['🚓','가까운 경찰서가 어디예요?'],['😰','저 사람이 저를 따라와요'],['🔥','불이 났어요!'],['💊','약을 잘못 먹었어요'],['🤕','다쳤어요'],['😵','쓰러진 사람이 있어요'],['🌊','침수됐어요'],['🚗','교통사고가 났어요'],['👶','아이를 잃어버렸어요'],['🏠','집에 못 들어가요'],['🔑','열쇠를 잃어버렸어요'],
+    ],
+  },
+  en: {
+    'Communication': [
+      ['👂🚫',"I am deaf / hard of hearing"],['✍️',"Please write it down"],['👍',"Yes"],['👎',"No"],['🙏',"Thank you"],['😔',"I'm sorry"],['🔁',"Please say that again"],['🐢',"Please speak slowly"],['✅',"I understand"],['❌',"I don't understand"],['✋',"Just a moment"],['😅',"I couldn't hear that, sorry"],['📱',"Please text me"],['📝',"Please write on paper"],['🤟',"Please call a sign language interpreter"],['👁️',"Please exaggerate your lip movements"],['🔢',"Please show me the number"],['📸',"Please show me the screen"],['💬',"Please contact me via text"],['🤝',"Nice to meet you"],
+    ],
+    'Cafe': [
+      ['☕',"One iced Americano, please"],['🧾',"I'd like to order"],['💳',"I'll pay by card"],['📦',"To go, please"],['🪑',"For here"],['🧊',"Extra ice, please"],['🧊',"No ice, please"],['🍬',"No sugar, please"],['🥛',"No syrup, please"],['🌡️',"Hot, please"],['📏',"Upsize, please"],['🔄',"Can I get a refill?"],['📶',"What's the Wi-Fi password?"],['🔌',"Where is the outlet?"],['⏰',"How long is the wait?"],['🧋',"I'd like a bubble tea"],['🎂',"Do you have cake?"],['🥤',"Is my order ready?"],['🗑️',"Where do I put the empty cup?"],['🚻',"Where is the restroom?"],
+    ],
+    'Restaurant': [
+      ['📋',"May I see the menu?"],['👇',"I'll have this"],['💳',"I'll pay by card"],['🧾',"Receipt, please"],['📦',"To go, please"],['🪑',"Do you have a table?"],['💧',"More water, please"],['🌶️',"Not spicy, please"],['⚠️',"I have an allergy"],['💵',"I'll pay with cash"],['🔄',"Can I get a refill?"],['⏳',"How long is the wait?"],['🧊',"No ice, please"],['🔥',"Hot, please"],['🥄',"More utensils, please"],['🧻',"Napkins, please"],['😋',"It was delicious!"],['🔔',"Please call a staff member"],['💺',"A window seat, please"],['🚻',"Where is the restroom?"],
+    ],
+    'Shopping': [
+      ['💰',"How much is this?"],['💳',"Do you accept cards?"],['🔄',"I'd like to exchange this"],['💸',"I'd like a refund"],['📍',"Where is it?"],['📏',"Do you have another size?"],['🎨',"Do you have another color?"],['🛍️',"A bag, please"],['🧾',"Receipt, please"],['🏷️',"Is this on sale?"],['📦',"Is it in stock?"],['⭐',"I have a discount card"],['📱',"Please add points"],['🎁',"Gift wrap, please"],['🔍',"I'm looking for this item"],['💲',"Do you have anything cheaper?"],['🔖',"Is this sold out?"],['🪞',"Where is the fitting room?"],['🅿️',"Where is the parking lot?"],['🚻',"Where is the restroom?"],
+    ],
+    'Hospital': [
+      ['👂🚫',"I am deaf / hard of hearing"],['✍️',"Please write it down"],['📅',"I have an appointment"],['🤕',"It hurts here"],['💊',"I need this medicine"],['🆘',"Emergency!"],['📄',"I have a prescription"],['🤟',"Please connect a sign language interpreter"],['💰',"How much is the fee?"],['📅',"When is my next appointment?"],['⚠️',"I have an allergy"],['😨',"I have side effects"],['👨‍👩‍👧',"Please call my guardian"],['❓',"How many times a day?"],['🍽️',"Before or after meals?"],['🩺',"Which department should I go to?"],['📋',"Please issue a medical certificate"],['💉',"Do I need a shot?"],['🚑',"Please call an ambulance"],['📞',"Please text me the results"],
+    ],
+    'Transportation': [
+      ['🗺️',"I want to go here"],['🚕',"Please call a taxi"],['🛑',"Stop here, please"],['⏱️',"How long will it take?"],['💳',"Do you accept cards?"],['🚌',"Does this bus go here?"],['📍',"Where is the next stop?"],['🚇',"Where is the subway station?"],['🔄',"Do I need to transfer?"],['📍',"Please go to this address"],['🧳',"Please open the trunk"],['⚡',"Please hurry (it's urgent)"],['🧾',"Receipt, please"],['😟',"I'm lost"],['🚇',"Which line do I take?"],['🎫',"I'd like to top up my transit card"],['♿',"Where is the disabled seat?"],['✈️',"Is there a bus to the airport?"],['📱',"Please call a taxi via app"],['🚻',"Where is the restroom?"],
+    ],
+    'School': [
+      ['👂🚫',"I am deaf / hard of hearing"],['✍️',"Please write it down"],['🤟',"I need sign language interpreter support"],['📋',"I'm here to submit an assignment"],['📅',"I'd like to schedule a consultation"],['📝',"Please check my attendance"],['🏫',"I'd like to meet my teacher"],['📖',"I'd like to borrow a textbook"],['🖥️',"Can I get caption/stenography support?"],['🎧',"I wear a hearing aid"],['📚',"Where is the library?"],['🖨️',"I'd like to use the printer"],['📅',"When is the exam?"],['🏥',"Where is the nurse's office?"],['🍱',"Where is the cafeteria?"],['🚌',"School bus information, please"],['📋',"I'd like to receive my report card"],['🎓',"I'd like to apply for a scholarship"],['📞',"Emergency contact, please"],['🚻',"Where is the restroom?"],
+    ],
+    'Workplace': [
+      ['👂🚫',"I am deaf / hard of hearing"],['✍️',"Please write it down"],['🤟',"I need sign language interpreter support"],['📋',"Please share meeting notes by text"],['💻',"Please send it by email"],['📅',"I'd like to check the schedule"],['📝',"Please give instructions in writing"],['🖥️',"Is caption/stenography support available?"],['🔔',"I can't hear notifications, please text me"],['📊',"Please show the material on screen"],['🤝',"Nice to meet you"],['👋',"I'm leaving for the day"],['🏠',"Can I work from home?"],['📅',"I'd like to request annual leave"],['💰',"I have a question about my pay"],['🖨️',"Where is the printer?"],['☕',"Where is the cafeteria?"],['🚻',"Where is the restroom?"],['🅿️',"I'd like to register for parking"],['♿',"Where are the disability facilities?"],
+    ],
+    'Accommodation': [
+      ['🏨',"I'd like to check in"],['🚪',"I'd like to check out"],['👤',"Here is the reservation name"],['🔑',"My room key doesn't work"],['📶',"How do I connect to Wi-Fi?"],['🛁',"More towels, please"],['💼',"Please hold my luggage"],['📱',"Please text me (instead of a wake-up call)"],['🤫',"Please keep it quiet"],['🍜',"Recommend a nearby restaurant"],['🧹',"Please clean the room"],['🔌',"Where is the outlet?"],['❄️',"The AC doesn't work"],['🔥',"The heat doesn't work"],['🛏️',"Please change the bed sheets"],['🪥',"Toothbrush/toothpaste, please"],['🧴',"More shampoo/conditioner, please"],['📺',"The TV doesn't turn on"],['🅿️',"Can I use the parking lot?"],['🌅',"What time does breakfast start?"],
+    ],
+    'Bank': [
+      ['👂🚫',"I am deaf / hard of hearing"],['✍️',"Can we communicate in writing?"],['💰',"I'd like to deposit/withdraw"],['💳',"I'd like to open an account"],['🔢',"Where do I get a number ticket?"],['📝',"I need help filling out forms"],['🤟',"Is sign language interpretation available?"],['💸',"I'd like to transfer money"],['🔒',"I forgot my password"],['💳',"I lost my card"],['🏠',"I'd like loan consultation"],['📊',"I'd like to check my balance"],['📄',"Please print my transaction history"],['💱',"I'd like to exchange currency"],['📱',"I'd like to register for mobile banking"],['📋',"I'd like to pay a utility bill"],['🏧',"Where is the ATM?"],['🔐',"Reset internet banking password"],['🐢',"Please write slowly"],['🙋',"Please change the staff member"],
+    ],
+    'Government': [
+      ['👂🚫',"I am deaf / hard of hearing"],['✍️',"Please write it down"],['🤟',"Please call a sign language interpreter"],['📋',"Please issue a resident registration certificate"],['🪪',"I brought my ID"],['🔢',"Where do I get a number ticket?"],['📝',"Please help me fill out this form"],['♿',"I'd like to apply for disability welfare services"],['🏠',"I'd like to register a change of address"],['💰',"I'd like to apply for basic living support"],['📄',"Please issue a family relations certificate"],['🏥',"I'd like to apply for disability medical support"],['🚌',"I'd like disability transportation support"],['📋',"Please issue a seal certificate"],['🎓',"I'd like disability education support"],['📱',"I'd like to apply for telecom fee discount"],['💳',"Please reissue my disability card"],['🏛️',"Which counter should I go to?"],['⏳',"How long is the wait?"],['📅',"I'd like to make an appointment"],
+    ],
+    'Emergency': [
+      ['🆘',"Help!"],['⚡',"Emergency!"],['🚒',"Please call 119"],['🚔',"Please call 112"],['👂🚫',"I am deaf / hard of hearing"],['🚑',"Please call an ambulance"],['😟',"I'm lost"],['👛',"I lost my wallet"],['📱',"I lost my phone"],['🚓',"Where is the nearest police station?"],['😰',"Someone is following me"],['🔥',"Fire!"],['💊',"I took the wrong medicine"],['🤕',"I'm injured"],['😵',"Someone collapsed"],['🌊',"There's flooding"],['🚗',"There's been a car accident"],['👶',"I lost a child"],['🏠',"I can't get into my house"],['🔑',"I lost my key"],
+    ],
+  },
+  ja: {
+    'コミュニケーション': [
+      ['👂🚫','私は聴覚障害者です'],['✍️','書いていただけますか'],['👍','はい'],['👎','いいえ'],['🙏','ありがとうございます'],['😔','申し訳ありません'],['🔁','もう一度言ってください'],['🐢','ゆっくり話してください'],['✅','わかりました'],['❌','わかりません'],['✋','少しお待ちください'],['😅','聞き取れませんでした'],['📱','メッセージで連絡してください'],['📝','紙に書いてください'],['🤟','手話通訳者を呼んでください'],['👁️','口を大きく動かしてください'],['🔢','数字で教えてください'],['📸','画面を見せてください'],['💬','テキストで連絡します'],['🤝','よろしくお願いします'],
+    ],
+    'カフェ': [
+      ['☕','アイスアメリカーノを一杯ください'],['🧾','注文したいのですが'],['💳','カードで支払います'],['📦','テイクアウトです'],['🪑','店内で飲みます'],['🧊','氷を多めにください'],['🧊','氷なしでお願いします'],['🍬','砂糖なしでお願いします'],['🥛','シロップなしでお願いします'],['🌡️','温かくしてください'],['📏','サイズアップしてください'],['🔄','おかわりはできますか？'],['📶','Wi-Fiのパスワードは何ですか？'],['🔌','コンセントはどこですか？'],['⏰','どのくらい待ちますか？'],['🧋','タピオカティーをください'],['🎂','ケーキはありますか？'],['🥤','飲み物はできましたか？'],['🗑️','空のカップはどこに捨てますか？'],['🚻','お手洗いはどこですか？'],
+    ],
+    'レストラン': [
+      ['📋','メニューを見せてください'],['👇','これをください'],['💳','カードで支払います'],['🧾','領収書をください'],['📦','包んでください'],['🪑','席はありますか？'],['💧','お水をもう一杯ください'],['🌶️','辛くしないでください'],['⚠️','アレルギーがあります'],['💵','現金で支払います'],['🔄','おかわりはできますか？'],['⏳','どのくらい待ちますか？'],['🧊','氷なしでお願いします'],['🔥','温かくしてください'],['🥄','スプーンをもう一本ください'],['🧻','ナプキンをください'],['😋','ごちそうさまでした'],['🔔','スタッフを呼んでください'],['💺','窓側の席をお願いします'],['🚻','お手洗いはどこですか？'],
+    ],
+    'ショッピング': [
+      ['💰','いくらですか？'],['💳','カードは使えますか？'],['🔄','交換したいのですが'],['💸','返金してください'],['📍','どこにありますか？'],['📏','別のサイズはありますか？'],['🎨','別の色はありますか？'],['🛍️','袋をください'],['🧾','領収書をください'],['🏷️','セール中ですか？'],['📦','在庫はありますか？'],['⭐','割引カードがあります'],['📱','ポイントを積んでください'],['🎁','ギフト包装をお願いします'],['🔍','この商品を探しています'],['💲','もっと安いものはありますか？'],['🔖','これは売り切れですか？'],['🪞','試着室はどこですか？'],['🅿️','駐車場はどこですか？'],['🚻','お手洗いはどこですか？'],
+    ],
+    '病院': [
+      ['👂🚫','私は聴覚障害者です'],['✍️','書いてください'],['📅','予約しています'],['🤕','ここが痛いです'],['💊','この薬をください'],['🆘','緊急事態です！'],['📄','処方箋があります'],['🤟','手話通訳者を繋いでください'],['💰','診察費はいくらですか？'],['📅','次の予約はいつですか？'],['⚠️','アレルギーがあります'],['😨','副作用があります'],['👨‍👩‍👧','保護者を呼んでください'],['❓','一日何回飲みますか？'],['🍽️','食前・食後ですか？'],['🩺','何科に行けばいいですか？'],['📋','診断書を発行してください'],['💉','注射が必要ですか？'],['🚑','救急車を呼んでください'],['📞','結果をメッセージで教えてください'],
+    ],
+    '交通': [
+      ['🗺️','ここに行きたいです'],['🚕','タクシーを呼んでください'],['🛑','ここで止めてください'],['⏱️','どのくらいかかりますか？'],['💳','カードは使えますか？'],['🚌','このバスはここに行きますか？'],['📍','次のバス停はどこですか？'],['🚇','地下鉄の駅はどこですか？'],['🔄','乗り換えが必要ですか？'],['📍','この住所に行ってください'],['🧳','トランクを開けてください'],['⚡','急いでください（緊急です）'],['🧾','領収書をください'],['😟','迷子になりました'],['🚇','何線に乗ればいいですか？'],['🎫','交通カードをチャージしたいです'],['♿','障害者席はどこですか？'],['✈️','空港行きのバスはありますか？'],['📱','タクシーアプリで呼んでください'],['🚻','お手洗いはどこですか？'],
+    ],
+    '学校': [
+      ['👂🚫','私は聴覚障害者です'],['✍️','書いていただけますか'],['🤟','手話通訳者のサポートが必要です'],['📋','課題を提出しに来ました'],['📅','相談を予約したいです'],['📝','出席を確認してください'],['🏫','担当の先生に会いたいです'],['📖','教科書を借りたいです'],['🖥️','字幕・速記支援は受けられますか？'],['🎧','補聴器を着用しています'],['📚','図書館はどこですか？'],['🖨️','プリンターを使いたいです'],['📅','試験の日程はいつですか？'],['🏥','保健室はどこですか？'],['🍱','食堂はどこですか？'],['🚌','通学バスの情報を知りたいです'],['📋','成績表をもらいたいです'],['🎓','奨学金を申請したいです'],['📞','緊急連絡先を教えてください'],['🚻','お手洗いはどこですか？'],
+    ],
+    '職場': [
+      ['👂🚫','私は聴覚障害者です'],['✍️','書いていただけますか'],['🤟','手話通訳者のサポートが必要です'],['📋','会議の内容をテキストで共有してください'],['💻','メールで送ってください'],['📅','スケジュールを確認したいです'],['📝','業務指示をメモでください'],['🖥️','字幕・速記支援はありますか？'],['🔔','通知が聞こえません、メッセージをください'],['📊','資料を画面で見せてください'],['🤝','はじめまして'],['👋','今日は帰ります'],['🏠','在宅勤務は可能ですか？'],['📅','有給休暇を申請したいです'],['💰','給与について質問があります'],['🖨️','プリンターはどこですか？'],['☕','社員食堂はどこですか？'],['🚻','お手洗いはどこですか？'],['🅿️','駐車場の登録をしたいです'],['♿','障害者向け施設はどこですか？'],
+    ],
+    '宿泊': [
+      ['🏨','チェックインをしたいです'],['🚪','チェックアウトをしたいです'],['👤','予約者名をお伝えします'],['🔑','部屋の鍵が使えません'],['📶','Wi-Fiの接続方法を教えてください'],['🛁','タオルをもっとください'],['💼','荷物を預かってください'],['📱','テキストで知らせてください（モーニングコールの代わりに）'],['🤫','静かにしてください'],['🍜','近くのおすすめレストランを教えてください'],['🧹','部屋を掃除してください'],['🔌','コンセントはどこですか？'],['❄️','エアコンが調節できません'],['🔥','暖房が効きません'],['🛏️','ベッドシーツを交換してください'],['🪥','歯ブラシ・歯磨き粉をください'],['🧴','シャンプー・リンスをもっとください'],['📺','テレビがつきません'],['🅿️','駐車場は使えますか？'],['🌅','朝食は何時からですか？'],
+    ],
+    '銀行': [
+      ['👂🚫','私は聴覚障害者です'],['✍️','書いてやり取りしてもいいですか？'],['💰','入金・出金したいです'],['💳','口座を開きたいです'],['🔢','番号札はどこで取りますか？'],['📝','書類の記入を手伝ってください'],['🤟','手話通訳サービスはありますか？'],['💸','振込をしたいです'],['🔒','パスワードを忘れました'],['💳','カードを紛失しました'],['🏠','ローンの相談をしたいです'],['📊','残高を確認したいです'],['📄','取引明細を印刷してください'],['💱','両替をしたいです'],['📱','モバイルバンキングを登録したいです'],['📋','公共料金を支払いたいです'],['🏧','ATMはどこですか？'],['🔐','インターネットバンキングのパスワードをリセット'],['🐢','ゆっくり書いてください'],['🙋','担当者を替えてください'],
+    ],
+    '行政': [
+      ['👂🚫','私は聴覚障害者です'],['✍️','書いていただけますか'],['🤟','手話通訳者を呼んでください'],['📋','住民票を発行してください'],['🪪','身分証を持ってきました'],['🔢','番号札はどこで取りますか？'],['📝','この書類の記入を手伝ってください'],['♿','障害者福祉サービスを申請したいです'],['🏠','転入届を出したいです'],['💰','生活保護を申請したいです'],['📄','家族関係証明書を発行してください'],['🏥','障害者医療費支援を申請したいです'],['🚌','障害者交通費支援を受けたいです'],['📋','印鑑証明書を発行してください'],['🎓','障害者教育支援を受けたいです'],['📱','障害者通信料減免を申請します'],['💳','障害者カードを再発行してください'],['🏛️','どの窓口に行けばいいですか？'],['⏳','どのくらい待ちますか？'],['📅','予約をしたいです'],
+    ],
+    '緊急': [
+      ['🆘','助けてください！'],['⚡','緊急事態です！'],['🚒','119に電話してください'],['🚔','110に電話してください'],['👂🚫','私は聴覚障害者です'],['🚑','救急車を呼んでください'],['😟','迷子になりました'],['👛','財布をなくしました'],['📱','スマホをなくしました'],['🚓','最寄りの警察署はどこですか？'],['😰','あの人に尾行されています'],['🔥','火事です！'],['💊','薬を間違えて飲みました'],['🤕','けがをしました'],['😵','倒れた人がいます'],['🌊','浸水しました'],['🚗','交通事故が起きました'],['👶','子供を見失いました'],['🏠','家に入れません'],['🔑','鍵をなくしました'],
+    ],
+  },
+  zh: {
+    '沟通': [
+      ['👂🚫','我是听障人士'],['✍️','请用文字沟通，谢谢'],['👍','是'],['👎','不是'],['🙏','谢谢'],['😔','对不起'],['🔁','请再说一遍'],['🐢','请慢慢说'],['✅','我明白了'],['❌','我不明白'],['✋','请稍等'],['😅','我没听清楚，对不起'],['📱','请发短信给我'],['📝','请写在纸上'],['🤟','请叫手语翻译'],['👁️','请夸张口型'],['🔢','请用数字告诉我'],['📸','请给我看屏幕'],['💬','请通过短信联系我'],['🤝','请多关照'],
+    ],
+    '咖啡厅': [
+      ['☕','请给我一杯冰美式咖啡'],['🧾','我要点餐'],['💳','我用卡付款'],['📦','打包带走'],['🪑','在这里喝（堂食）'],['🧊','请多放冰块'],['🧊','请不要放冰块'],['🍬','请不要放糖'],['🥛','请不要放糖浆'],['🌡️','请做热的'],['📏','请升级大杯'],['🔄','可以续杯吗？'],['📶','Wi-Fi密码是多少？'],['🔌','插座在哪里？'],['⏰','需要等多长时间？'],['🧋','我要一杯珍珠奶茶'],['🎂','有蛋糕吗？'],['🥤','饮料好了吗？'],['🗑️','空杯子放哪里？'],['🚻','洗手间在哪里？'],
+    ],
+    '餐厅': [
+      ['📋','请给我看菜单'],['👇','我要这个'],['💳','我用卡付款'],['🧾','请给我收据'],['📦','请打包'],['🪑','有位子吗？'],['💧','请再给我一杯水'],['🌶️','请不要放辣'],['⚠️','我有过敏症'],['💵','我用现金付款'],['🔄','可以续杯吗？'],['⏳','需要等多长时间？'],['🧊','请不要放冰块'],['🔥','请做热的'],['🥄','请再给我餐具'],['🧻','请给我纸巾'],['😋','很好吃，谢谢'],['🔔','请叫服务员'],['💺','请给我靠窗的位置'],['🚻','洗手间在哪里？'],
+    ],
+    '购物': [
+      ['💰','这个多少钱？'],['💳','可以刷卡吗？'],['🔄','我想换货'],['💸','我想退款'],['📍','在哪里？'],['📏','有其他尺码吗？'],['🎨','有其他颜色吗？'],['🛍️','请给我袋子'],['🧾','请给我收据'],['🏷️','在打折吗？'],['📦','有库存吗？'],['⭐','我有折扣卡'],['📱','请积分'],['🎁','请包装成礼品'],['🔍','我在找这个商品'],['💲','有更便宜的吗？'],['🔖','这个卖完了吗？'],['🪞','试衣间在哪里？'],['🅿️','停车场在哪里？'],['🚻','洗手间在哪里？'],
+    ],
+    '医院': [
+      ['👂🚫','我是听障人士'],['✍️','请写下来'],['📅','我有预约'],['🤕','这里痛'],['💊','我需要这个药'],['🆘','紧急情况！'],['📄','我有处方'],['🤟','请接通手语翻译'],['💰','诊疗费多少钱？'],['📅','下次预约是什么时候？'],['⚠️','我有过敏症'],['😨','我有副作用'],['👨‍👩‍👧','请叫监护人'],['❓','一天吃几次？'],['🍽️','饭前还是饭后吃？'],['🩺','应该去哪个科？'],['📋','请开诊断书'],['💉','需要打针吗？'],['🚑','请叫救护车'],['📞','请发短信告诉我结果'],
+    ],
+    '交通': [
+      ['🗺️','我想去这里'],['🚕','请叫出租车'],['🛑','请在这里停车'],['⏱️','需要多长时间？'],['💳','可以刷卡吗？'],['🚌','这辆公共汽车去那里吗？'],['📍','下一站在哪里？'],['🚇','地铁站在哪里？'],['🔄','需要换乘吗？'],['📍','请去这个地址'],['🧳','请打开后备箱'],['⚡','请快点（很紧急）'],['🧾','请给我收据'],['😟','我迷路了'],['🚇','我应该坐几号线？'],['🎫','我想充值交通卡'],['♿','残疾人座位在哪里？'],['✈️','有去机场的公共汽车吗？'],['📱','请用打车软件叫车'],['🚻','洗手间在哪里？'],
+    ],
+    '学校': [
+      ['👂🚫','我是听障人士'],['✍️','请用文字沟通'],['🤟','我需要手语翻译支持'],['📋','我来提交作业'],['📅','我想预约咨询'],['📝','请确认出勤'],['🏫','我想见负责老师'],['📖','我想借教材'],['🖥️','可以提供字幕支持吗？'],['🎧','我佩戴助听器'],['📚','图书馆在哪里？'],['🖨️','我想使用打印机'],['📅','考试是什么时候？'],['🏥','卫生室在哪里？'],['🍱','餐厅在哪里？'],['🚌','请告诉我校车信息'],['📋','我想要成绩单'],['🎓','我想申请奖学金'],['📞','请给我紧急联系方式'],['🚻','洗手间在哪里？'],
+    ],
+    '职场': [
+      ['👂🚫','我是听障人士'],['✍️','请用文字沟通'],['🤟','我需要手语翻译支持'],['📋','请用短信分享会议内容'],['💻','请发邮件给我'],['📅','我想确认日程'],['📝','请用便条给我业务指示'],['🖥️','有字幕支持吗？'],['🔔','我听不到通知，请发短信'],['📊','请在屏幕上展示资料'],['🤝','初次见面，请多关照'],['👋','我今天要下班了'],['🏠','可以居家办公吗？'],['📅','我想申请年假'],['💰','我有关于薪资的问题'],['🖨️','打印机在哪里？'],['☕','员工食堂在哪里？'],['🚻','洗手间在哪里？'],['🅿️','我想注册停车'],['♿','残疾人设施在哪里？'],
+    ],
+    '住宿': [
+      ['🏨','我想办理入住'],['🚪','我想退房'],['👤','预约人的姓名是'],['🔑','房间钥匙不能用'],['📶','请告诉我Wi-Fi连接方法'],['🛁','请多给我毛巾'],['💼','请保管我的行李'],['📱','请发短信通知我（代替叫醒电话）'],['🤫','请保持安静'],['🍜','请推荐附近的餐厅'],['🧹','请打扫房间'],['🔌','插座在哪里？'],['❄️','空调不能调节'],['🔥','暖气不工作'],['🛏️','请更换床单'],['🪥','请给我牙刷/牙膏'],['🧴','请多给我洗发水/护发素'],['📺','电视打不开'],['🅿️','可以使用停车场吗？'],['🌅','早餐几点开始？'],
+    ],
+    '银行': [
+      ['👂🚫','我是听障人士'],['✍️','可以用文字沟通吗？'],['💰','我想存款/取款'],['💳','我想开户'],['🔢','号码牌在哪里取？'],['📝','我需要帮助填写表格'],['🤟','有手语翻译服务吗？'],['💸','我想转账'],['🔒','我忘记密码了'],['💳','我丢失了卡'],['🏠','我想咨询贷款'],['📊','我想查询余额'],['📄','请打印交易记录'],['💱','我想换汇'],['📱','我想注册手机银行'],['📋','我想缴纳公共事业费'],['🏧','ATM在哪里？'],['🔐','重置网银密码'],['🐢','请慢慢写'],['🙋','请换一位工作人员'],
+    ],
+    '政府机构': [
+      ['👂🚫','我是听障人士'],['✍️','请用文字沟通'],['🤟','请叫手语翻译'],['📋','请开具户籍证明'],['🪪','我带了身份证'],['🔢','号码牌在哪里取？'],['📝','请帮我填写这份表格'],['♿','我想申请残疾人福利服务'],['🏠','我想办理迁入申报'],['💰','我想申请最低生活保障'],['📄','请开具家庭关系证明'],['🏥','我想申请残疾人医疗费支持'],['🚌','我想获得残疾人交通费支持'],['📋','请开具印章证明'],['🎓','我想获得残疾人教育支持'],['📱','我想申请残疾人通信费减免'],['💳','请重新补发残疾人证'],['🏛️','我应该去哪个窗口？'],['⏳','需要等多长时间？'],['📅','我想预约'],
+    ],
+    '紧急情况': [
+      ['🆘','救命！'],['⚡','紧急情况！'],['🚒','请拨打119'],['🚔','请拨打110'],['👂🚫','我是听障人士'],['🚑','请叫救护车'],['😟','我迷路了'],['👛','我的钱包丢了'],['📱','我的手机丢了'],['🚓','最近的警察局在哪里？'],['😰','那个人在跟踪我'],['🔥','着火了！'],['💊','我吃错药了'],['🤕','我受伤了'],['😵','有人晕倒了'],['🌊','发洪水了'],['🚗','发生了交通事故'],['👶','我的孩子丢失了'],['🏠','我进不了家'],['🔑','我的钥匙丢了'],
+    ],
+  },
+};
+
+// 탭과 섹션의 언어별 카테고리 이름
+const catNames = {
+  ko: ['소통','카페','식당','쇼핑','병원','교통','학교','직장','숙박','은행','관공서','긴급'],
+  en: ['Communication','Cafe','Restaurant','Shopping','Hospital','Transportation','School','Workplace','Accommodation','Bank','Government','Emergency'],
+  ja: ['コミュニケーション','カフェ','レストラン','ショッピング','病院','交通','学校','職場','宿泊','銀行','行政','緊急'],
+  zh: ['沟通','咖啡厅','餐厅','购物','医院','交通','学校','职场','住宿','银行','政府机构','紧急情况'],
+};
+
+const catEmojis = ['💬','☕','🍽️','🛒','🏥','🚌','🎓','💼','🏨','🏦','🏛️','🚨'];
+
+// 언어 표시 이름
+const langInfo = {
+  ko: { flag: '🇰🇷', name: '한국어' },
+  en: { flag: '🇺🇸', name: 'English' },
+  ja: { flag: '🇯🇵', name: '日本語' },
+  zh: { flag: '🇨🇳', name: '中文' },
+};
+
+// UI 문자열 번역
+const uiText = {
+  ko: {
+    header: '🤟 빠른 의사소통 카드',
+    changeVersion: '버전 변경',
+    fontLabel: '🔤 글씨', fontSm: '작게', fontLg: '크게',
+    voiceLabel: '🔊 음성', voiceOn: '켜기', voiceOff: '끄기',
+    langLabel: '🌐 언어',
+    quickInput: '✏️ 직접 입력해서 보여주기',
+    captionBtn: '🎙️ 상대방 말 실시간 자막으로 보기',
+    searchPlaceholder: '🔍 카드 검색...',
+    tabAll: '전체',
+    captionTitle: '🎙️ 실시간 자막',
+    captionWait: '대기 중', captionListening: '듣는 중...',
+    captionStart: '🎙️ 듣기 시작', captionStop: '⏹️ 멈추기',
+    captionClear: '🗑️ 지우기',
+    captionPlaceholder: '상대방의 말이 여기에 자막으로 나타납니다',
+    inputTitle: '✏️ 직접 입력해서 보여주기',
+    inputPlaceholder: '전하고 싶은 말을 입력하세요...',
+    btnShow: '📢 보여주기', btnSave: '💾 저장',
+    savedTitle: '💾 저장한 카드',
+    favoriteTitle: '⭐ 자주 쓰는 카드',
+    favoriteAdd: '⭐ 자주 쓰는 카드에 추가',
+    favoriteAdded: '⭐ 자주 쓰는 카드에 추가됐어요!',
+    favoriteAlready: '이미 자주 쓰는 카드에 있어요!',
+    speakAgain: '🔊 다시 듣기',
+    translateLabel: '🌐 다른 언어로 보기',
+    translateHint: '번역 중...',
+    speakTranslation: '🔊 듣기',
+    captionTranslateHint: '🌐 자막 번역',
+    versionTitle: '🤟 버전을 선택해 주세요',
+    versionSub: '언제든지 헤더의 버튼으로 바꿀 수 있어요',
+    vEmoji: '😊 이모지 있는 버전', vText: '📝 이모지 없는 버전',
+    vSelectBtn: '선택',
+  },
+  en: {
+    header: '🤟 Quick Communication Cards',
+    changeVersion: 'Change Version',
+    fontLabel: '🔤 Font', fontSm: 'Small', fontLg: 'Large',
+    voiceLabel: '🔊 Voice', voiceOn: 'On', voiceOff: 'Off',
+    langLabel: '🌐 Language',
+    quickInput: '✏️ Type & Show',
+    captionBtn: '🎙️ Live Captions',
+    searchPlaceholder: '🔍 Search cards...',
+    tabAll: 'All',
+    captionTitle: '🎙️ Live Captions',
+    captionWait: 'Standby', captionListening: 'Listening...',
+    captionStart: '🎙️ Start Listening', captionStop: '⏹️ Stop',
+    captionClear: '🗑️ Clear',
+    captionPlaceholder: "The other person's speech will appear here",
+    inputTitle: '✏️ Type & Show',
+    inputPlaceholder: 'Type what you want to say...',
+    btnShow: '📢 Show', btnSave: '💾 Save',
+    savedTitle: '💾 Saved Cards',
+    favoriteTitle: '⭐ Favorites',
+    favoriteAdd: '⭐ Add to Favorites',
+    favoriteAdded: '⭐ Added to Favorites!',
+    favoriteAlready: 'Already in Favorites!',
+    speakAgain: '🔊 Hear Again',
+    translateLabel: '🌐 View in Other Languages',
+    translateHint: 'Translating...',
+    speakTranslation: '🔊 Listen',
+    captionTranslateHint: '🌐 Translate Caption',
+    versionTitle: '🤟 Choose a Version',
+    versionSub: 'You can change it anytime from the header',
+    vEmoji: '😊 With Emojis', vText: '📝 Text Only',
+    vSelectBtn: 'Select',
+  },
+  ja: {
+    header: '🤟 コミュニケーションカード',
+    changeVersion: 'バージョン変更',
+    fontLabel: '🔤 文字', fontSm: '小', fontLg: '大',
+    voiceLabel: '🔊 音声', voiceOn: 'オン', voiceOff: 'オフ',
+    langLabel: '🌐 言語',
+    quickInput: '✏️ 直接入力して表示',
+    captionBtn: '🎙️ リアルタイム字幕',
+    searchPlaceholder: '🔍 カードを検索...',
+    tabAll: 'すべて',
+    captionTitle: '🎙️ リアルタイム字幕',
+    captionWait: '待機中', captionListening: '聞いています...',
+    captionStart: '🎙️ 聞き始める', captionStop: '⏹️ 止める',
+    captionClear: '🗑️ クリア',
+    captionPlaceholder: '相手の発言がここに字幕として表示されます',
+    inputTitle: '✏️ 直接入力して表示',
+    inputPlaceholder: '伝えたいことを入力してください...',
+    btnShow: '📢 表示', btnSave: '💾 保存',
+    savedTitle: '💾 保存したカード',
+    favoriteTitle: '⭐ よく使うカード',
+    favoriteAdd: '⭐ よく使うカードに追加',
+    favoriteAdded: '⭐ よく使うカードに追加しました！',
+    favoriteAlready: 'すでによく使うカードにあります！',
+    speakAgain: '🔊 もう一度聞く',
+    translateLabel: '🌐 他の言語で見る',
+    translateHint: '翻訳中...',
+    speakTranslation: '🔊 聞く',
+    captionTranslateHint: '🌐 字幕翻訳',
+    versionTitle: '🤟 バージョンを選んでください',
+    versionSub: 'いつでもヘッダーのボタンで変更できます',
+    vEmoji: '😊 絵文字あり', vText: '📝 テキストのみ',
+    vSelectBtn: '選択',
+  },
+  zh: {
+    header: '🤟 快速沟通卡片',
+    changeVersion: '切换版本',
+    fontLabel: '🔤 字体', fontSm: '小', fontLg: '大',
+    voiceLabel: '🔊 语音', voiceOn: '开', voiceOff: '关',
+    langLabel: '🌐 语言',
+    quickInput: '✏️ 输入并展示',
+    captionBtn: '🎙️ 实时字幕',
+    searchPlaceholder: '🔍 搜索卡片...',
+    tabAll: '全部',
+    captionTitle: '🎙️ 实时字幕',
+    captionWait: '等待中', captionListening: '正在聆听...',
+    captionStart: '🎙️ 开始聆听', captionStop: '⏹️ 停止',
+    captionClear: '🗑️ 清除',
+    captionPlaceholder: '对方说的话将在这里以字幕形式显示',
+    inputTitle: '✏️ 输入并展示',
+    inputPlaceholder: '请输入您想传达的话...',
+    btnShow: '📢 展示', btnSave: '💾 保存',
+    savedTitle: '💾 已保存卡片',
+    favoriteTitle: '⭐ 常用卡片',
+    favoriteAdd: '⭐ 添加到常用卡片',
+    favoriteAdded: '⭐ 已添加到常用卡片！',
+    favoriteAlready: '已经在常用卡片中了！',
+    speakAgain: '🔊 再次播放',
+    translateLabel: '🌐 用其他语言查看',
+    translateHint: '翻译中...',
+    speakTranslation: '🔊 收听',
+    captionTranslateHint: '🌐 翻译字幕',
+    versionTitle: '🤟 请选择版本',
+    versionSub: '随时可通过顶部按钮更改',
+    vEmoji: '😊 有表情符号', vText: '📝 仅文字',
+    vSelectBtn: '选择',
+  },
+};
+
+// 현재 언어
+let currentLang = 'ko';
+let cards = allCards.ko;
+
+// ── 현재 카드 위치 추적 ──────────────────────
+// 카드 클릭 시 저장: { catIndex, cardIndex } 또는 null(직접입력)
+let currentCardPosition = null;
+
+// 카드 인덱스로 다른 언어 텍스트 찾기
+function getCardTextByLang(targetLang, catIndex, cardIndex) {
+  const catKey = catNames[targetLang][catIndex];
+  const catData = allCards[targetLang][catKey];
+  if (!catData || !catData[cardIndex]) return null;
+  return catData[cardIndex][1];
+}
+
+// ── 번역 캐시 (직접입력용) ──────────────────
+const translateCache = {};
+
+// MyMemory 무료 번역 API - 직접 입력한 문장에만 사용
+async function translateFreeText(text, targetLang) {
+  const cacheKey = text + '__' + currentLang + '__' + targetLang;
+  if (translateCache[cacheKey]) return translateCache[cacheKey];
+
+  const langCode = { ko: 'ko', en: 'en', ja: 'ja', zh: 'zh-CN' };
+  const from = langCode[currentLang];
+  const to = langCode[targetLang];
+
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + from + '|' + to;
+  const response = await fetch(url);
+  const data = await response.json();
+
+  const result = data?.responseData?.translatedText?.trim() || text;
+  translateCache[cacheKey] = result;
+  return result;
+}
+
+// 스마트 번역: 카드면 데이터에서, 직접입력이면 API 사용
+async function translateWithClaude(text, targetLang) {
+  if (currentCardPosition !== null) {
+    const { catIndex, cardIndex } = currentCardPosition;
+    const found = getCardTextByLang(targetLang, catIndex, cardIndex);
+    if (found) return found;
+  }
+  // 직접 입력이거나 카드 데이터를 못 찾은 경우 → API 번역
+  return await translateFreeText(text, targetLang);
+}
+
+// 모달 번역 버튼 생성 (현재 언어 제외한 나머지 3개)
+function buildModalTranslateBtns() {
+  const container = document.getElementById('modalTranslateBtns');
+  container.innerHTML = '';
+  const allLangs = ['ko', 'en', 'ja', 'zh'];
+  allLangs.filter(l => l !== currentLang).forEach(lang => {
+    const btn = document.createElement('button');
+    btn.className = 'modal-translate-btn';
+    btn.textContent = langInfo[lang].flag + ' ' + langInfo[lang].name;
+    btn.dataset.lang = lang;
+    btn.onclick = () => handleModalTranslate(lang, btn);
+    container.appendChild(btn);
+  });
+}
+
+// 모달에서 번역 실행
+let currentTranslatedText = '';
+let currentTranslatedLang = '';
+
+async function handleModalTranslate(targetLang, btn) {
+  // 이미 선택된 언어면 토글 off
+  if (btn.classList.contains('active')) {
+    btn.classList.remove('active');
+    document.getElementById('modalTranslationBox').classList.remove('show');
+    currentTranslatedText = '';
+    currentTranslatedLang = '';
+    document.getElementById('modalTranslationSpeakBtn').style.display = 'none';
+    return;
+  }
+
+  // 다른 버튼 모두 비활성화
+  document.querySelectorAll('.modal-translate-btn').forEach(b => b.classList.remove('active', 'loading'));
+  btn.classList.add('active', 'loading');
+
+  const originalText = document.getElementById('modalText').textContent;
+  const box = document.getElementById('modalTranslationBox');
+  const textEl = document.getElementById('modalTranslationText');
+  const langEl = document.getElementById('modalTranslationLang');
+
+  textEl.innerHTML = '<span class="translate-spinner"></span>';
+  box.classList.add('show');
+
+  try {
+    const translated = await translateWithClaude(originalText, targetLang);
+    currentTranslatedText = translated;
+    currentTranslatedLang = targetLang;
+    langEl.textContent = langInfo[targetLang].flag + ' ' + langInfo[targetLang].name;
+    textEl.textContent = translated;
+    btn.classList.remove('loading');
+
+    const speakBtn = document.getElementById('modalTranslationSpeakBtn');
+    speakBtn.style.display = voiceEnabled ? 'inline-block' : 'none';
+    speakBtn.textContent = uiText[currentLang].speakTranslation;
+
+    // 음성 자동 재생
+    if (voiceEnabled) speakLang(translated, targetLang);
+  } catch (e) {
+    textEl.textContent = '번역 중 오류가 발생했어요.';
+    btn.classList.remove('active', 'loading');
+  }
+}
+
+function speakTranslation() {
+  if (currentTranslatedText && currentTranslatedLang) {
+    speakLang(currentTranslatedText, currentTranslatedLang);
+  }
+}
+
+// 자막 화면 번역 버튼 생성
+function buildCaptionTranslateBtns() {
+  const container = document.getElementById('captionTranslateBtns');
+  container.innerHTML = '';
+
+  const label = document.createElement('span');
+  label.style.cssText = 'font-size:12px;color:#64748b;font-weight:600;white-space:nowrap;';
+  label.textContent = uiText[currentLang].captionTranslateHint + ':';
+  container.appendChild(label);
+
+  const allLangs = ['ko', 'en', 'ja', 'zh'];
+  allLangs.forEach(lang => {
+    const btn = document.createElement('button');
+    btn.className = 'caption-translate-btn';
+    btn.textContent = langInfo[lang].flag + ' ' + langInfo[lang].name;
+    btn.dataset.lang = lang;
+    btn.onclick = () => handleCaptionTranslate(lang, btn);
+    container.appendChild(btn);
+  });
+}
+
+// 자막 번역 실행
+async function handleCaptionTranslate(targetLang, btn) {
+  const captionText = document.getElementById('captionFinal').textContent.trim();
+  const placeholderTexts = Object.values(uiText).map(u => u.captionPlaceholder);
+  if (!captionText || placeholderTexts.includes(captionText)) {
+    return;
+  }
+
+  // 같은 버튼 다시 누르면 닫기
+  if (btn.classList.contains('active')) {
+    btn.classList.remove('active');
+    document.getElementById('captionTranslationResult').classList.remove('show');
+    return;
+  }
+
+  document.querySelectorAll('.caption-translate-btn').forEach(b => b.classList.remove('active', 'loading'));
+  btn.classList.add('active', 'loading');
+
+  const resultBox = document.getElementById('captionTranslationResult');
+  const resultText = document.getElementById('captionTranslationText');
+  const resultLang = document.getElementById('captionTranslationLang');
+
+  resultText.innerHTML = '<span style="color:#94a3b8">번역 중...</span>';
+  resultBox.classList.add('show');
+
+  try {
+    const translated = await translateWithClaude(captionText, targetLang);
+    resultLang.textContent = langInfo[targetLang].flag + ' ' + langInfo[targetLang].name;
+    resultText.textContent = translated;
+    btn.classList.remove('loading');
+  } catch (e) {
+    resultText.textContent = '번역 오류';
+    btn.classList.remove('active', 'loading');
+  }
+}
+
+// 언어 전환
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  cards = allCards[lang];
+
+  ['ko','en','ja','zh'].forEach(l => {
+    document.getElementById('lang-' + l).classList.toggle('active', l === lang);
+  });
+
+  if (recognition) { recognition.lang = lang === 'ko' ? 'ko-KR' : lang === 'en' ? 'en-US' : lang === 'ja' ? 'ja-JP' : 'zh-CN'; }
+
+  applyUIText();
+  rebuildSections();
+  renderCards();
+  renderSaved();
+  applyEmojiMode();
+  buildModalTranslateBtns();
+  buildCaptionTranslateBtns();
+}
+
+// UI 텍스트 적용
+function applyUIText() {
+  const t = uiText[currentLang];
+  const set = (id, val, prop='textContent') => {
+    const el = document.getElementById(id);
+    if (el) el[prop] = val;
+  };
+  const setAll = (sel, val) => document.querySelectorAll(sel).forEach(el => el.textContent = val);
+
+  set('headerTitle', t.header);
+  set('btnChangeVersion', t.changeVersion);
+  set('labelFont', t.fontLabel);
+  set('btn-sm', t.fontSm);
+  set('btn-lg', t.fontLg);
+  set('labelVoice', t.voiceLabel);
+  set('btn-voice-on', t.voiceOn);
+  set('btn-voice-off', t.voiceOff);
+  set('labelLang', t.langLabel);
+  set('btnQuickInput', t.quickInput);
+  set('btnCaptionLaunch', t.captionBtn);
+  set('searchInput', t.searchPlaceholder, 'placeholder');
+  set('tabAll', t.tabAll);
+  set('captionScreenTitle', t.captionTitle);
+  set('captionStatusText', isListening ? t.captionListening : t.captionWait);
+  set('btnCaptionToggle', isListening ? t.captionStop : t.captionStart);
+  set('btnCaptionClear', t.captionClear);
+  const cf = document.getElementById('captionFinal');
+  if (cf && (cf.textContent === '' || Object.values(uiText).some(u => u.captionPlaceholder === cf.textContent))) {
+    cf.textContent = t.captionPlaceholder;
+  }
+  set('inputModalTitle', t.inputTitle);
+  set('modalCustomText', t.inputPlaceholder, 'placeholder');
+  set('btnModalShow', t.btnShow);
+  set('btnModalSave', t.btnSave);
+  set('btnSpeak', t.speakAgain);
+  set('savedSectionTitle', t.savedTitle);
+  set('favoriteTitleEl', t.favoriteTitle);
+  set('ctxFavoriteBtn', t.favoriteAdd);
+  set('modalTranslateLabel', t.translateLabel);
+  set('versionTitle', t.versionTitle);
+  set('versionSubtitle', t.versionSub);
+  set('vEmojiTitle', t.vEmoji);
+  set('vTextTitle', t.vText);
+  setAll('.btn-select-version', t.vSelectBtn);
+}
+
+// 섹션과 탭 재구성
+function rebuildSections() {
+  const names = catNames[currentLang];
+  const tabsEl = document.getElementById('tabs');
+  const contentEl = document.getElementById('allContent');
+  const t = uiText[currentLang];
+
+  tabsEl.innerHTML = `<button class="tab active" id="tabAll" onclick="filterTab('all', this)">${t.tabAll}</button>`;
+  names.forEach((name, i) => {
+    tabsEl.innerHTML += `<button class="tab" onclick="filterTab('${name}', this)">${catEmojis[i]} ${name}</button>`;
+  });
+
+  contentEl.innerHTML = '';
+  names.forEach((name, i) => {
+    contentEl.innerHTML += `
+      <div class="section" data-cat="${name}">
+        <div class="section-title"><span class="emoji">${catEmojis[i]}</span> ${name}</div>
+        <div class="card-grid" id="grid-${name}"></div>
+      </div>`;
+  });
+  contentEl.innerHTML += `
+    <div class="section" id="savedSection">
+      <div class="section-title"><span class="emoji">💾</span> <span id="savedSectionTitle">${t.savedTitle}</span></div>
+      <div class="saved-custom" id="savedCustom"></div>
+    </div>`;
+}
+
+// 숨긴 카드 목록 불러오기
+let hiddenCards = JSON.parse(localStorage.getItem('hiddenCards') || '[]');
+let lastDeleted = null;
+let restoreTimer = null;
+
+// 카드 렌더링
+function renderCards() {
+  const names = catNames[currentLang];
+  Object.keys(cards).forEach(cat => {
+    const grid = document.getElementById('grid-' + cat);
+    if (!grid) return;
+    const catIndex = names.indexOf(cat);
+    grid.innerHTML = cards[cat]
+      .map(([emoji, text], originalIndex) => {
+        if (isHidden(cat, text)) return '';
+        const safeText = text.replace(/'/g, "\'");
+        return `<div class="card"
+          onclick="showCard('${emoji}', '${safeText}', ${catIndex}, ${originalIndex})"
+          oncontextmenu="return false"
+          data-cat="${cat}"
+          data-cat-index="${catIndex}"
+          data-card-index="${originalIndex}"
+          data-text="${text.replace(/"/g,'&quot;')}"
+          data-emoji="${emoji}">
+          <span class="card-emoji">${emoji}</span>
+          <span class="card-text">${text}</span>
+        </div>`;
+      }).join('');
+
+
+    grid.querySelectorAll('.card').forEach(card => {
+      let pressTimer;
+      card.addEventListener('touchstart', e => {
+        card.classList.add('pressing');
+        pressTimer = setTimeout(() => {
+          card.classList.remove('pressing');
+          openContextMenu(e.touches[0].clientX, e.touches[0].clientY, card);
+        }, 600);
+      }, { passive: true });
+      card.addEventListener('touchend', () => {
+        clearTimeout(pressTimer);
+        card.classList.remove('pressing');
+      });
+      card.addEventListener('touchmove', () => {
+        clearTimeout(pressTimer);
+        card.classList.remove('pressing');
+      });
+      card.addEventListener('mousedown', e => {
+        if (e.button !== 0) return;
+        pressTimer = setTimeout(() => {
+          openContextMenu(e.clientX, e.clientY, card);
+        }, 600);
+      });
+      card.addEventListener('mouseup', () => clearTimeout(pressTimer));
+      card.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+    });
+  });
+}
+
+function isHidden(cat, text) {
+  return hiddenCards.some(h => h.cat === cat && h.text === text);
+}
+
+let ctxTarget = null;
+function openContextMenu(x, y, card) {
+  ctxTarget = card;
+  const menu = document.getElementById('ctxMenu');
+  document.getElementById('ctxTitle').textContent = card.dataset.emoji + ' ' + card.dataset.text;
+  document.getElementById('ctxOverlay').classList.add('show');
+
+  menu.style.display = 'block';
+  const mw = menu.offsetWidth;
+  const mh = menu.offsetHeight;
+  let left = x - mw / 2;
+  let top = y - mh - 10;
+  if (left < 8) left = 8;
+  if (left + mw > window.innerWidth - 8) left = window.innerWidth - mw - 8;
+  if (top < 60) top = y + 10;
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+  menu.style.display = '';
+  menu.classList.add('show');
+}
+
+function closeContextMenu() {
+  document.getElementById('ctxMenu').classList.remove('show');
+  document.getElementById('ctxOverlay').classList.remove('show');
+  ctxTarget = null;
+}
+
+function ctxShow() {
+  if (!ctxTarget) return;
+  const catIndex = parseInt(ctxTarget.dataset.catIndex ?? '-1');
+  const cardIndex = parseInt(ctxTarget.dataset.cardIndex ?? '-1');
+  showCard(ctxTarget.dataset.emoji, ctxTarget.dataset.text, catIndex, cardIndex);
+  closeContextMenu();
+}
+
+function ctxDelete() {
+  if (!ctxTarget) return;
+  const cat = ctxTarget.dataset.cat;
+  const text = ctxTarget.dataset.text;
+  const emoji = ctxTarget.dataset.emoji;
+  lastDeleted = { cat, text, emoji };
+  hiddenCards.push({ cat, text, emoji });
+  localStorage.setItem('hiddenCards', JSON.stringify(hiddenCards));
+  closeContextMenu();
+  renderCards();
+  showRestoreBar();
+}
+
+function showRestoreBar() {
+  const bar = document.getElementById('restoreBar');
+  bar.classList.add('show');
+  clearTimeout(restoreTimer);
+  restoreTimer = setTimeout(() => bar.classList.remove('show'), 5000);
+}
+
+function undoDelete() {
+  if (!lastDeleted) return;
+  hiddenCards = hiddenCards.filter(h => !(h.cat === lastDeleted.cat && h.text === lastDeleted.text));
+  localStorage.setItem('hiddenCards', JSON.stringify(hiddenCards));
+  lastDeleted = null;
+  renderCards();
+  document.getElementById('restoreBar').classList.remove('show');
+}
+
+function showHiddenManager() {
+  document.getElementById('restoreBar').classList.remove('show');
+  if (hiddenCards.length === 0) { alert('숨긴 카드가 없어요!'); return; }
+  const list = hiddenCards.map((h, i) =>
+    `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:15px">${h.emoji} ${h.text}</span>
+      <button onclick="restoreCard(${i})" style="padding:4px 12px;border-radius:50px;border:2px solid #4ade80;background:transparent;color:#4ade80;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;">복원</button>
+    </div>`
+  ).join('');
+
+  document.getElementById('modalEmoji').textContent = '🗑️';
+  document.getElementById('modalText').innerHTML = `<div style="font-size:16px;font-weight:700;margin-bottom:12px">숨긴 카드 목록</div><div style="text-align:left">${list}</div>`;
+  document.getElementById('modal').classList.add('show');
+}
+
+function restoreCard(i) {
+  hiddenCards.splice(i, 1);
+  localStorage.setItem('hiddenCards', JSON.stringify(hiddenCards));
+  renderCards();
+  closeModal();
+}
+
+// ── 버전 선택 ──────────────────────────────
+let emojiMode = 'emoji';
+
+function openVersionSelect() {
+  document.getElementById('versionOverlay').classList.add('show');
+  setVersionLang(currentLang);
+}
+
+const previewTexts = {
+  ko: ['메뉴판 보여주세요','카드로 결제할게요','저는 청각장애인입니다','감사합니다'],
+  en: ['May I see the menu?','I will pay by card','I am deaf','Thank you'],
+  ja: ['メニューを見せてください','カードで支払います','私は聴覚障害者です','ありがとうございます'],
+  zh: ['请给我看菜单','我用卡付款','我是听障人士','谢谢'],
+};
+
+function setVersionLang(lang) {
+  ['ko','en','ja','zh'].forEach(l => {
+    const btn = document.getElementById('vlang-' + l);
+    if (btn) btn.classList.toggle('active', l === lang);
+  });
+  const texts = previewTexts[lang] || previewTexts.ko;
+  texts.forEach((txt, i) => {
+    const e = document.getElementById('prev-e-' + i);
+    const t = document.getElementById('prev-t-' + i);
+    if (e) e.textContent = txt;
+    if (t) t.textContent = txt;
+  });
+  setLang(lang);
+}
+
+function selectVersion(mode) {
+  emojiMode = mode;
+  localStorage.setItem('emojiMode', mode);
+  document.getElementById('versionOverlay').classList.remove('show');
+  applyEmojiMode();
+}
+
+function applyEmojiMode() {
+  document.querySelectorAll('.card-emoji').forEach(el => {
+    el.style.display = emojiMode === 'emoji' ? '' : 'none';
+  });
+  document.getElementById('modalEmoji').style.display = emojiMode === 'emoji' ? '' : 'none';
+}
+
+// ── 실시간 자막 ──────────────────────────────
+let recognition = null;
+let isListening = false;
+let finalText = '';
+
+function updateCaptionSize(val) {
+  document.getElementById('captionScreen').style.setProperty('--caption-font-size', val + 'px');
+  document.getElementById('captionSizeValue').textContent = val + 'px';
+  localStorage.setItem('captionFontSize', val);
+}
+
+function openCaptionScreen() {
+  document.getElementById('captionScreen').classList.add('show');
+  finalText = '';
+  document.getElementById('captionFinal').textContent = uiText[currentLang].captionPlaceholder;
+  document.getElementById('captionInterim').textContent = '';
+  document.getElementById('captionTranslationResult').classList.remove('show');
+  document.querySelectorAll('.caption-translate-btn').forEach(b => b.classList.remove('active'));
+  const savedSize = localStorage.getItem('captionFontSize') || '52';
+  document.getElementById('captionSizeSlider').value = savedSize;
+  updateCaptionSize(savedSize);
+  buildCaptionTranslateBtns();
+}
+
+function closeCaptionScreen() {
+  stopListening();
+  document.getElementById('captionScreen').classList.remove('show');
+}
+
+function clearCaption() {
+  finalText = '';
+  document.getElementById('captionFinal').textContent = '';
+  document.getElementById('captionInterim').textContent = '';
+  document.getElementById('captionTranslationResult').classList.remove('show');
+  document.querySelectorAll('.caption-translate-btn').forEach(b => b.classList.remove('active'));
+}
+
+function toggleListening() {
+  if (isListening) {
+    stopListening();
+  } else {
+    startListening();
+  }
+}
+
+function startListening() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('이 브라우저는 음성 인식을 지원하지 않아요.\n크롬(Chrome) 브라우저를 사용해 주세요.');
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  const langMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' };
+  recognition.lang = langMap[currentLang] || 'ko-KR';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    isListening = true;
+    document.getElementById('captionDot').classList.remove('off');
+    document.getElementById('captionStatusText').textContent = uiText[currentLang].captionListening;
+    document.getElementById('btnCaptionToggle').textContent = uiText[currentLang].captionStop;
+    document.getElementById('btnCaptionToggle').classList.add('listening');
+    const placeholderTexts = Object.values(uiText).map(u => u.captionPlaceholder);
+    if (placeholderTexts.includes(document.getElementById('captionFinal').textContent)) {
+      document.getElementById('captionFinal').textContent = '';
+    }
+  };
+
+  recognition.onresult = (event) => {
+    let interim = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalText += transcript + ' ';
+      } else {
+        interim += transcript;
+      }
+    }
+    document.getElementById('captionFinal').textContent = finalText;
+    document.getElementById('captionInterim').textContent = interim;
+    const el = document.getElementById('captionFinal');
+    el.scrollTop = el.scrollHeight;
+
+    // 번역 버튼이 활성화된 상태면 자동 재번역
+    const activeBtn = document.querySelector('.caption-translate-btn.active');
+    if (activeBtn && finalText.trim()) {
+      handleCaptionTranslate(activeBtn.dataset.lang, activeBtn);
+    }
+  };
+
+  recognition.onerror = (event) => {
+    if (event.error === 'not-allowed') {
+      alert('마이크 권한이 필요해요.\n브라우저 설정에서 마이크를 허용해 주세요.');
+    }
+    stopListening();
+  };
+
+  recognition.onend = () => {
+    if (isListening) recognition.start();
+  };
+
+  recognition.start();
+}
+
+function stopListening() {
+  isListening = false;
+  if (recognition) {
+    recognition.onend = null;
+    recognition.stop();
+    recognition = null;
+  }
+  document.getElementById('captionDot').classList.add('off');
+  document.getElementById('captionStatusText').textContent = uiText[currentLang].captionWait;
+  document.getElementById('btnCaptionToggle').textContent = uiText[currentLang].captionStart;
+  document.getElementById('btnCaptionToggle').classList.remove('listening');
+  document.getElementById('captionInterim').textContent = '';
+}
+
+// ── 음성 합성 ──────────────────────────────
+let voiceEnabled = false;
+
+function speakLang(text, lang) {
+  if (typeof speechSynthesis === 'undefined') return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const langMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' };
+  utter.lang = langMap[lang] || 'ko-KR';
+  utter.pitch = 1.0;
+  utter.rate = 0.92;
+  speechSynthesis.speak(utter);
+}
+
+function speak(text) {
+  if (!voiceEnabled) return;
+  const btn = document.getElementById('btnSpeak');
+  if (btn) btn.classList.add('speaking');
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const langMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' };
+  utter.lang = langMap[currentLang] || 'ko-KR';
+  utter.pitch = 1.0;
+  utter.rate = 0.92;
+  utter.onend = () => { if (btn) btn.classList.remove('speaking'); };
+  utter.onerror = () => { if (btn) btn.classList.remove('speaking'); };
+  speechSynthesis.speak(utter);
+}
+
+function speakModalText() {
+  speak(document.getElementById('modalText').textContent);
+}
+
+function setVoice(mode) {
+  voiceEnabled = (mode === 'on');
+  document.getElementById('btn-voice-on').classList.toggle('active', voiceEnabled);
+  document.getElementById('btn-voice-off').classList.toggle('active', !voiceEnabled);
+  document.getElementById('btnSpeak').style.display = voiceEnabled ? 'block' : 'none';
+  localStorage.setItem('voiceEnabled', mode);
+}
+
+// ── 카드 표시 모달 ──────────────────────────
+function showCard(emoji, text, catIndex, cardIndex) {
+  document.getElementById('modalEmoji').textContent = emoji;
+  document.getElementById('modalText').textContent = text;
+  document.getElementById('btnSpeak').style.display = voiceEnabled ? 'block' : 'none';
+
+  // 카드 위치 저장 (카드 클릭이면 저장, 직접입력이면 null)
+  if (catIndex !== undefined && catIndex >= 0) {
+    currentCardPosition = { catIndex, cardIndex };
+  } else {
+    currentCardPosition = null;
+  }
+
+  // 번역 결과 초기화
+  document.getElementById('modalTranslationBox').classList.remove('show');
+  document.getElementById('modalTranslationSpeakBtn').style.display = 'none';
+  currentTranslatedText = '';
+  currentTranslatedLang = '';
+
+  // 번역 버튼 재생성 (현재 언어 반영)
+  buildModalTranslateBtns();
+
+  document.getElementById('modal').classList.add('show');
+  speak(text);
+  applyEmojiMode();
+}
+
+function closeModal() {
+  speechSynthesis.cancel();
+  document.getElementById('modal').classList.remove('show');
+}
+
+// 탭 필터
+function filterTab(cat, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.section[data-cat]').forEach(s => {
+    s.style.display = (cat === 'all' || s.dataset.cat === cat) ? '' : 'none';
+  });
+  document.getElementById('searchInput').value = '';
+}
+
+// 검색 필터
+function filterCards() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.tab').classList.add('active');
+
+  document.querySelectorAll('.section[data-cat]').forEach(section => {
+    const cards = section.querySelectorAll('.card');
+    let visible = 0;
+    cards.forEach(card => {
+      const match = card.querySelector('.card-text').textContent.toLowerCase().includes(q);
+      card.style.display = (!q || match) ? '' : 'none';
+      if (!q || match) visible++;
+    });
+    section.style.display = (visible > 0 || !q) ? '' : 'none';
+  });
+}
+
+// 직접입력 모달
+function openInputModal() {
+  document.getElementById('inputModal').classList.add('show');
+  setTimeout(() => document.getElementById('modalCustomText').focus(), 300);
+}
+
+function closeInputModal() {
+  document.getElementById('inputModal').classList.remove('show');
+}
+
+function modalShowCustom() {
+  const emoji = document.getElementById('modalCustomEmoji').value || '💬';
+  const text = document.getElementById('modalCustomText').value.trim();
+  if (!text) { alert('전하고 싶은 말을 입력해주세요!'); return; }
+  closeInputModal();
+  showCard(emoji, text);
+}
+
+function modalSaveCustom() {
+  const emoji = document.getElementById('modalCustomEmoji').value || '💬';
+  const text = document.getElementById('modalCustomText').value.trim();
+  if (!text) { alert('저장할 말을 입력해주세요!'); return; }
+  savedItems.push({ emoji, text });
+  localStorage.setItem('customCards', JSON.stringify(savedItems));
+  renderSaved();
+  document.getElementById('modalCustomText').value = '';
+  document.getElementById('modalCustomEmoji').value = '';
+  closeInputModal();
+}
+
+function modalFavoriteCustom() {
+  const emoji = document.getElementById('modalCustomEmoji').value || '💬';
+  const text = document.getElementById('modalCustomText').value.trim();
+  if (!text) { alert('추가할 말을 입력해주세요!'); return; }
+  if (favoriteItems.some(f => f.text === text)) {
+    alert(uiText[currentLang].favoriteAlready);
+    return;
+  }
+  favoriteItems.push({ emoji, text });
+  localStorage.setItem('favoriteCards', JSON.stringify(favoriteItems));
+  renderFavorites();
+  document.getElementById('modalCustomText').value = '';
+  document.getElementById('modalCustomEmoji').value = '';
+  closeInputModal();
+}
+
+// 저장
+let savedItems = JSON.parse(localStorage.getItem('customCards') || '[]');
+
+// ── 자주 쓰는 카드 ──────────────────────────
+let favoriteItems = JSON.parse(localStorage.getItem('favoriteCards') || '[]');
+
+function ctxFavorite() {
+  if (!ctxTarget) return;
+  const emoji = ctxTarget.dataset.emoji;
+  const text = ctxTarget.dataset.text;
+  if (favoriteItems.some(f => f.text === text)) {
+    alert(uiText[currentLang].favoriteAlready);
+    closeContextMenu();
+    return;
+  }
+  favoriteItems.push({ emoji, text });
+  localStorage.setItem('favoriteCards', JSON.stringify(favoriteItems));
+  renderFavorites();
+  closeContextMenu();
+  // 짧은 안내 토스트
+  const bar = document.getElementById('restoreBar');
+  bar.querySelector('span').textContent = uiText[currentLang].favoriteAdded;
+  bar.classList.add('show');
+  clearTimeout(restoreTimer);
+  restoreTimer = setTimeout(() => {
+    bar.classList.remove('show');
+    bar.querySelector('span').textContent = '🗑️ 카드가 숨겨졌어요';
+  }, 2500);
+}
+
+function deleteFavorite(i) {
+  favoriteItems.splice(i, 1);
+  localStorage.setItem('favoriteCards', JSON.stringify(favoriteItems));
+  renderFavorites();
+}
+
+function renderFavorites() {
+  const bar = document.getElementById('favoriteBar');
+  const chips = document.getElementById('favoriteChips');
+  if (favoriteItems.length === 0) {
+    bar.style.display = 'none';
+    return;
+  }
+  bar.style.display = '';
+  chips.innerHTML = favoriteItems.map((item, i) => {
+    const safeText = item.text.replace(/'/g, "\'");
+    return `<div class="saved-chip" onclick="showCard('${item.emoji}', '${safeText}')" style="border-color:#fcd34d; background:#fffbeb;">
+      <span>${item.emoji}</span>
+      <span style="font-weight:700">${item.text}</span>
+      <span class="del-btn" onclick="event.stopPropagation(); deleteFavorite(${i})">×</span>
+    </div>`;
+  }).join('');
+}
+
+function deleteCustom(i) {
+  savedItems.splice(i, 1);
+  localStorage.setItem('customCards', JSON.stringify(savedItems));
+  renderSaved();
+}
+
+function renderSaved() {
+  const container = document.getElementById('savedCustom');
+  const section = document.getElementById('savedSection');
+  if (savedItems.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+  container.innerHTML = savedItems.map((item, i) => `
+    <div class="saved-chip" onclick="showCard('${item.emoji}', '${item.text.replace(/'/g,"\\'")}')">
+      <span>${item.emoji}</span>
+      <span>${item.text}</span>
+      <span class="del-btn" onclick="event.stopPropagation(); deleteCustom(${i})">×</span>
+    </div>
+  `).join('');
+}
+
+// 글씨 크기 설정
+function setFont(size) {
+  document.body.classList.toggle('font-lg', size === 'lg');
+  document.getElementById('btn-sm').classList.toggle('active', size === 'sm');
+  document.getElementById('btn-lg').classList.toggle('active', size === 'lg');
+  localStorage.setItem('fontSize', size);
+}
+
+// 저장된 설정 불러오기
+(function() {
+  const savedFont   = localStorage.getItem('fontSize') || 'sm';
+  const savedVoice  = localStorage.getItem('voiceEnabled') || 'off';
+  const savedEmoji  = localStorage.getItem('emojiMode');
+  const savedLang   = localStorage.getItem('lang') || 'ko';
+
+  setLang(savedLang);
+  setFont(savedFont);
+  setVoice(savedVoice);
+  renderFavorites();
+
+  if (!savedEmoji) {
+    document.getElementById('versionOverlay').classList.add('show');
+  } else {
+    emojiMode = savedEmoji;
+    applyEmojiMode();
+  }
+})();
+</script>
+</body>
+</html>
