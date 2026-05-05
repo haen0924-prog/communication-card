@@ -1212,7 +1212,7 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 8px 14px;
+    padding: 8px 14px 10px;
     background: #f8fafc;
     border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
@@ -1224,7 +1224,7 @@
     margin-right: 2px;
   }
   .lang-btn {
-    padding: 5px 14px;
+    padding: 5px 11px;
     border-radius: 50px;
     border: 2px solid var(--border);
     background: transparent;
@@ -1324,6 +1324,9 @@
     <button class="version-lang-btn" id="vlang-en" onclick="setVersionLang('en')">🇺🇸 English</button>
     <button class="version-lang-btn" id="vlang-ja" onclick="setVersionLang('ja')">🇯🇵 日本語</button>
     <button class="version-lang-btn" id="vlang-zh" onclick="setVersionLang('zh')">🇨🇳 中文</button>
+    <button class="version-lang-btn" id="vlang-es" onclick="setVersionLang('es')">🇪🇸 Español</button>
+    <button class="version-lang-btn" id="vlang-fr" onclick="setVersionLang('fr')">🇫🇷 Français</button>
+    <button class="version-lang-btn" id="vlang-de" onclick="setVersionLang('de')">🇩🇪 Deutsch</button>
   </div>
 
   <div class="version-cards">
@@ -1382,6 +1385,9 @@
   <button class="lang-btn" id="lang-en" onclick="setLang('en')">🇺🇸 English</button>
   <button class="lang-btn" id="lang-ja" onclick="setLang('ja')">🇯🇵 日本語</button>
   <button class="lang-btn" id="lang-zh" onclick="setLang('zh')">🇨🇳 中文</button>
+  <button class="lang-btn" id="lang-es" onclick="setLang('es')">🇪🇸 Español</button>
+  <button class="lang-btn" id="lang-fr" onclick="setLang('fr')">🇫🇷 Français</button>
+  <button class="lang-btn" id="lang-de" onclick="setLang('de')">🇩🇪 Deutsch</button>
 </div>
 
 <div class="quick-input-bar">
@@ -1646,6 +1652,120 @@ const allCards = {
       ['🆘','助けてください！'],['⚡','緊急事態です！'],['🚒','119に電話してください'],['🚔','110に電話してください'],['👂🚫','私は聴覚障害者です'],['🚑','救急車を呼んでください'],['😟','迷子になりました'],['👛','財布をなくしました'],['📱','スマホをなくしました'],['🚓','最寄りの警察署はどこですか？'],['😰','あの人に尾行されています'],['🔥','火事です！'],['💊','薬を間違えて飲みました'],['🤕','けがをしました'],['😵','倒れた人がいます'],['🌊','浸水しました'],['🚗','交通事故が起きました'],['👶','子供を見失いました'],['🏠','家に入れません'],['🔑','鍵をなくしました'],
     ],
   },
+  es: {
+    'Comunicación': [
+      ['👂🚫','Soy una persona con discapacidad auditiva'],['✍️','Por favor, escríbalo'],['👍','Sí'],['👎','No'],['🙏','Gracias'],['😔','Lo siento'],['🔁','Por favor, repítalo'],['🐢','Por favor, hable despacio'],['✅','Entendido'],['❌','No entiendo'],['✋','Un momento, por favor'],['😅','No pude escuchar, lo siento'],['📱','Por favor, envíeme un mensaje'],['📝','Por favor, escríbalo en papel'],['🤟','Por favor, llame a un intérprete de señas'],['👁️','Por favor, exagere los movimientos de sus labios'],['🔢','Por favor, muéstreme el número'],['📸','Por favor, muéstreme la pantalla'],['💬','Contácteme por mensaje de texto'],['🤝','Mucho gusto'],
+    ],
+    'Cafetería': [
+      ['☕','Un café americano con hielo, por favor'],['🧾','Quiero ordenar'],['💳','Pagaré con tarjeta'],['📦','Para llevar, por favor'],['🪑','Para consumir aquí'],['🧊','Más hielo, por favor'],['🧊','Sin hielo, por favor'],['🍬','Sin azúcar, por favor'],['🥛','Sin jarabe, por favor'],['🌡️','Caliente, por favor'],['📏','Tamaño grande, por favor'],['🔄','¿Hay recarga?'],['📶','¿Cuál es la contraseña del Wi-Fi?'],['🔌','¿Dónde hay un enchufe?'],['⏰','¿Cuánto tiempo de espera?'],['🧋','Quiero un té de burbujas'],['🎂','¿Tienen pastel?'],['🥤','¿Ya está mi pedido?'],['🗑️','¿Dónde pongo el vaso vacío?'],['🚻','¿Dónde está el baño?'],
+    ],
+    'Restaurante': [
+      ['📋','¿Puedo ver el menú?'],['👇','Quiero esto'],['💳','Pagaré con tarjeta'],['🧾','La cuenta, por favor'],['📦','Para llevar, por favor'],['🪑','¿Tienen mesa disponible?'],['💧','Más agua, por favor'],['🛍️','Para llevar'],['🌶️','Sin picante, por favor'],['⚠️','Tengo alergia'],['💵','Pagaré en efectivo'],['🔄','¿Hay recarga?'],['⏳','¿Cuánto tiempo de espera?'],['🧊','Sin hielo, por favor'],['🔥','Caliente, por favor'],['🥄','Más cubiertos, por favor'],['🧻','Servilletas, por favor'],['😋','¡Estaba delicioso!'],['🔔','Por favor, llame al personal'],['🚻','¿Dónde está el baño?'],
+    ],
+    'Compras': [
+      ['💰','¿Cuánto cuesta esto?'],['💳','¿Aceptan tarjeta?'],['🔄','Quiero cambiarlo'],['💸','Quiero un reembolso'],['📍','¿Dónde está?'],['📏','¿Tienen otra talla?'],['🎨','¿Tienen otro color?'],['🛍️','Una bolsa, por favor'],['🧾','El recibo, por favor'],['🏷️','¿Está en oferta?'],['📦','¿Tienen en stock?'],['⭐','Tengo tarjeta de descuento'],['📱','Por favor, acumule puntos'],['🎁','Envoltura para regalo, por favor'],['🔍','Estoy buscando este artículo'],['💲','¿Tienen algo más barato?'],['🔖','¿Está agotado?'],['🪞','¿Dónde está el probador?'],['🅿️','¿Dónde está el estacionamiento?'],['🚻','¿Dónde está el baño?'],
+    ],
+    'Hospital': [
+      ['👂🚫','Soy una persona con discapacidad auditiva'],['✍️','Por favor, escríbalo'],['📅','Tengo una cita'],['🤕','Me duele aquí'],['💊','Necesito este medicamento'],['🆘','¡Es una emergencia!'],['📄','Tengo una receta'],['🤟','Por favor, conecte a un intérprete de señas'],['💰','¿Cuánto es la consulta?'],['📅','¿Cuándo es mi próxima cita?'],['⚠️','Tengo alergia'],['😨','Tengo efectos secundarios'],['👨‍👩‍👧','Por favor, llame a mi tutor'],['❓','¿Cuántas veces al día?'],['🍽️','¿Antes o después de comer?'],['🩺','¿A qué departamento debo ir?'],['📋','Por favor, expida un certificado médico'],['💉','¿Necesito una inyección?'],['🚑','Por favor, llame a una ambulancia'],['📞','Por favor, envíeme los resultados por mensaje'],
+    ],
+    'Transporte': [
+      ['🗺️','Quiero ir aquí'],['🚕','Por favor, llame un taxi'],['🛑','Pare aquí, por favor'],['⏱️','¿Cuánto tiempo tardará?'],['💳','¿Aceptan tarjeta?'],['🚌','¿Este autobús va aquí?'],['📍','¿Cuál es la próxima parada?'],['🚇','¿Dónde está la estación de metro?'],['🔄','¿Tengo que hacer transbordo?'],['📍','Por favor, lléveme a esta dirección'],['🧳','Por favor, abra el maletero'],['⚡','Por favor, dese prisa (es urgente)'],['🧾','El recibo, por favor'],['😟','Estoy perdido/a'],['🚇','¿Qué línea tomo?'],['🎫','Quiero recargar mi tarjeta de transporte'],['♿','¿Dónde están los asientos para discapacitados?'],['✈️','¿Hay autobús al aeropuerto?'],['📱','Por favor, llame un taxi por la app'],['🚻','¿Dónde está el baño?'],
+    ],
+    'Escuela': [
+      ['👂🚫','Soy una persona con discapacidad auditiva'],['✍️','Por favor, escríbalo'],['🤟','Necesito apoyo de intérprete de señas'],['📋','Vengo a entregar una tarea'],['📅','Quiero programar una consulta'],['📝','Por favor, verifique mi asistencia'],['🏫','Quiero reunirme con mi profesor'],['📖','Quiero tomar prestado un libro de texto'],['🖥️','¿Puedo recibir apoyo de subtítulos?'],['🎧','Llevo audífono'],['📚','¿Dónde está la biblioteca?'],['🖨️','Quiero usar la impresora'],['📅','¿Cuándo es el examen?'],['🏥','¿Dónde está la enfermería?'],['🍱','¿Dónde está el comedor?'],['🚌','Información del autobús escolar, por favor'],['📋','Quiero recibir mi boletín de notas'],['🎓','Quiero solicitar una beca'],['📞','El contacto de emergencia, por favor'],['🚻','¿Dónde está el baño?'],
+    ],
+    'Trabajo': [
+      ['👂🚫','Soy una persona con discapacidad auditiva'],['✍️','Por favor, escríbalo'],['🤟','Necesito apoyo de intérprete de señas'],['📋','Por favor, comparta las notas de la reunión por mensaje'],['💻','Por favor, envíelo por correo electrónico'],['📅','Quiero verificar el horario'],['📝','Por favor, dé instrucciones por escrito'],['🖥️','¿Hay apoyo de subtítulos?'],['🔔','No escucho las notificaciones, por favor envíe mensaje'],['📊','Por favor, muestre el material en pantalla'],['🤝','Mucho gusto'],['👋','Me voy por hoy'],['🏠','¿Puedo trabajar desde casa?'],['📅','Quiero solicitar vacaciones'],['💰','Tengo una pregunta sobre mi salario'],['🖨️','¿Dónde está la impresora?'],['☕','¿Dónde está la cafetería?'],['🚻','¿Dónde está el baño?'],['🅿️','Quiero registrarme para estacionamiento'],['♿','¿Dónde están las instalaciones para discapacitados?'],
+    ],
+    'Alojamiento': [
+      ['🏨','Quiero hacer el check-in'],['🚪','Quiero hacer el check-out'],['👤','Este es el nombre de la reserva'],['🔑','La llave de mi habitación no funciona'],['📶','¿Cómo me conecto al Wi-Fi?'],['🛁','Más toallas, por favor'],['💼','Por favor, guarde mi equipaje'],['📱','Por favor, envíeme un mensaje (en lugar de llamada)'],['🤫','Por favor, mantenga silencio'],['🍜','Recomiende un restaurante cercano'],['🧹','Por favor, limpie la habitación'],['🔌','¿Dónde está el enchufe?'],['❄️','El aire acondicionado no funciona'],['🔥','La calefacción no funciona'],['🛏️','Por favor, cambie las sábanas'],['🪥','Cepillo/pasta de dientes, por favor'],['🧴','Más champú/acondicionador, por favor'],['📺','El televisor no enciende'],['🅿️','¿Puedo usar el estacionamiento?'],['🌅','¿A qué hora empieza el desayuno?'],
+    ],
+    'Banco': [
+      ['👂🚫','Soy una persona con discapacidad auditiva'],['✍️','¿Podemos comunicarnos por escrito?'],['💰','Quiero depositar/retirar dinero'],['💳','Quiero abrir una cuenta'],['🔢','¿Dónde saco el número de turno?'],['📝','Necesito ayuda para llenar formularios'],['🤟','¿Hay servicio de interpretación de señas?'],['💸','Quiero transferir dinero'],['🔒','Olvidé mi contraseña'],['💳','Perdí mi tarjeta'],['🏠','Quiero consultar sobre un préstamo'],['📊','Quiero consultar mi saldo'],['📄','Por favor, imprima mi historial de transacciones'],['💱','Quiero cambiar divisas'],['📱','Quiero registrarme en la banca móvil'],['📋','Quiero pagar una factura de servicios'],['🏧','¿Dónde está el cajero automático?'],['🔐','Restablecer contraseña de banca en línea'],['🐢','Por favor, escriba despacio'],['🙋','Por favor, cámbiame de atención'],
+    ],
+    'Gobierno': [
+      ['👂🚫','Soy una persona con discapacidad auditiva'],['✍️','Por favor, escríbalo'],['🤟','Por favor, llame a un intérprete de señas'],['📋','Por favor, expida un certificado de residencia'],['🪪','Traje mi identificación'],['🔢','¿Dónde saco el número de turno?'],['📝','Por favor, ayúdeme a llenar este formulario'],['♿','Quiero solicitar servicios de bienestar para discapacitados'],['🏠','Quiero registrar un cambio de domicilio'],['💰','Quiero solicitar apoyo básico de vida'],['📄','Por favor, expida un certificado de relaciones familiares'],['🏥','Quiero solicitar apoyo médico para discapacitados'],['🚌','Quiero apoyo de transporte para discapacitados'],['📋','Por favor, expida un certificado de sello'],['🎓','Quiero apoyo educativo para discapacitados'],['📱','Quiero solicitar descuento en tarifas de telecomunicaciones'],['💳','Por favor, reexpida mi tarjeta de discapacitado'],['🏛️','¿A qué ventanilla debo ir?'],['⏳','¿Cuánto tiempo de espera?'],['📅','Quiero hacer una cita'],
+    ],
+    'Emergencia': [
+      ['🆘','¡Ayuda!'],['⚡','¡Es una emergencia!'],['🚒','Por favor, llame al 112'],['🚔','Por favor, llame a la policía'],['👂🚫','Soy una persona con discapacidad auditiva'],['🚑','Por favor, llame a una ambulancia'],['😟','Estoy perdido/a'],['👛','Perdí mi billetera'],['📱','Perdí mi teléfono'],['🚓','¿Dónde está la comisaría más cercana?'],['😰','Alguien me está siguiendo'],['🔥','¡Hay un incendio!'],['💊','Tomé el medicamento equivocado'],['🤕','Estoy herido/a'],['😵','Alguien se ha desmayado'],['🌊','Hay inundación'],['🚗','Hubo un accidente de tráfico'],['👶','Perdí a un niño'],['🏠','No puedo entrar a mi casa'],['🔑','Perdí mi llave'],
+    ],
+  },
+  fr: {
+    'Communication': [
+      ['👂🚫',"Je suis malentendant(e)"],['✍️',"Pouvez-vous écrire, s'il vous plaît"],['👍','Oui'],['👎','Non'],['🙏','Merci'],['😔',"Je suis désolé(e)"],['🔁',"Pouvez-vous répéter, s'il vous plaît"],['🐢',"Parlez lentement, s'il vous plaît"],['✅',"J'ai compris"],['❌',"Je ne comprends pas"],['✋',"Un instant, s'il vous plaît"],['😅',"Je n'ai pas entendu, désolé(e)"],['📱',"Envoyez-moi un message, s'il vous plaît"],['📝',"Écrivez sur papier, s'il vous plaît"],['🤟','Appelez un interprète en langue des signes'],['👁️','Exagérez les mouvements de vos lèvres'],['🔢',"Montrez-moi le numéro, s'il vous plaît"],['📸',"Montrez-moi l'écran, s'il vous plaît"],['💬','Contactez-moi par message'],['🤝',"Enchanté(e)"],
+    ],
+    'Café': [
+      ['☕',"Un café américain glacé, s'il vous plaît"],['🧾','Je voudrais commander'],['💳','Je paie par carte'],['📦',"À emporter, s'il vous plaît"],['🪑','Pour consommer sur place'],['🧊',"Plus de glaçons, s'il vous plaît"],['🧊',"Sans glaçons, s'il vous plaît"],['🍬',"Sans sucre, s'il vous plaît"],['🥛',"Sans sirop, s'il vous plaît"],['🌡️',"Chaud, s'il vous plaît"],['📏',"Grande taille, s'il vous plaît"],['🔄',"Est-ce qu'il y a des recharges ?"],['📶','Quel est le mot de passe Wi-Fi ?'],['🔌','Où est la prise électrique ?'],['⏰',"Combien de temps d'attente ?"],['🧋','Je voudrais un thé aux perles'],['🎂','Avez-vous des gâteaux ?'],['🥤','Ma commande est-elle prête ?'],['🗑️','Où dois-je mettre le verre vide ?'],['🚻','Où sont les toilettes ?'],
+    ],
+    'Restaurant': [
+      ['📋','Puis-je voir le menu ?'],['👇','Je prends ceci'],['💳','Je paie par carte'],["🧾","L'addition, s'il vous plaît"],['📦',"À emporter, s'il vous plaît"],['🪑','Avez-vous une table disponible ?'],['💧',"Encore de l'eau, s'il vous plaît"],['🌶️',"Sans épices, s'il vous plaît"],['⚠️',"J'ai une allergie"],['💵','Je paie en espèces'],['🔄',"Est-ce qu'il y a des recharges ?"],['⏳',"Combien de temps d'attente ?"],['🧊',"Sans glaçons, s'il vous plaît"],['🔥',"Chaud, s'il vous plaît"],['🥄',"Plus de couverts, s'il vous plaît"],['🧻',"Des serviettes, s'il vous plaît"],['😋',"C'était délicieux !"],['🔔',"Appelez le personnel, s'il vous plaît"],['💺',"Une table côté fenêtre, s'il vous plaît"],['🚻','Où sont les toilettes ?'],
+    ],
+    'Shopping': [
+      ['💰','Combien ça coûte ?'],['💳','Acceptez-vous les cartes ?'],['🔄',"Je voudrais l'échanger"],['💸','Je voudrais un remboursement'],['📍','Où est-ce ?'],['📏','Avez-vous une autre taille ?'],['🎨','Avez-vous une autre couleur ?'],['🛍️',"Un sac, s'il vous plaît"],['🧾',"Le reçu, s'il vous plaît"],['🏷️','Est-ce en promotion ?'],['📦','Est-ce en stock ?'],['⭐',"J'ai une carte de réduction"],['📱',"Ajoutez des points, s'il vous plaît"],['🎁',"Emballage cadeau, s'il vous plaît"],['🔍','Je cherche cet article'],['💲','Avez-vous quelque chose de moins cher ?'],['🔖',"C'est épuisé ?"],['🪞',"Où sont les cabines d'essayage ?"],['🅿️','Où est le parking ?'],['🚻','Où sont les toilettes ?'],
+    ],
+    'Hôpital': [
+      ['👂🚫',"Je suis malentendant(e)"],['✍️',"Écrivez, s'il vous plaît"],['📅',"J'ai un rendez-vous"],['🤕',"J'ai mal ici"],['💊',"J'ai besoin de ce médicament"],['🆘',"C'est une urgence !"],['📄',"J'ai une ordonnance"],['🤟','Connectez un interprète en langue des signes'],['💰','Combien coûte la consultation ?'],['📅','Quand est mon prochain rendez-vous ?'],['⚠️',"J'ai une allergie"],['😨',"J'ai des effets secondaires"],['👨‍👩‍👧',"Appelez mon tuteur, s'il vous plaît"],['❓','Combien de fois par jour ?'],['🍽️','Avant ou après les repas ?'],['🩺','Dans quel service dois-je aller ?'],['📋',"Délivrez un certificat médical, s'il vous plaît"],['💉',"Ai-je besoin d'une injection ?"],['🚑',"Appelez une ambulance, s'il vous plaît"],['📞','Envoyez-moi les résultats par message'],
+    ],
+    'Transport': [
+      ['🗺️','Je veux aller ici'],['🚕',"Appelez un taxi, s'il vous plaît"],['🛑',"Arrêtez-vous ici, s'il vous plaît"],['⏱️','Combien de temps cela prendra-t-il ?'],['💳','Acceptez-vous les cartes ?'],['🚌','Ce bus va-t-il ici ?'],['📍','Quel est le prochain arrêt ?'],['🚇','Où est la station de métro ?'],['🔄','Dois-je changer ?'],['📍',"Allez à cette adresse, s'il vous plaît"],['🧳',"Ouvrez le coffre, s'il vous plaît"],['⚡','Dépêchez-vous (urgent)'],['🧾',"Le reçu, s'il vous plaît"],['😟','Je suis perdu(e)'],['🚇','Quelle ligne dois-je prendre ?'],['🎫','Je voudrais recharger ma carte de transport'],['♿','Où sont les sièges handicapés ?'],['✈️',"Y a-t-il un bus pour l'aéroport ?"],['📱',"Appelez un taxi via l'application"],['🚻','Où sont les toilettes ?'],
+    ],
+    'École': [
+      ['👂🚫',"Je suis malentendant(e)"],['✍️',"Écrivez, s'il vous plaît"],['🤟',"J'ai besoin d'un interprète en langue des signes"],['📋','Je viens remettre un devoir'],['📅','Je voudrais prendre un rendez-vous'],['📝',"Vérifiez mon assiduité, s'il vous plaît"],['🏫','Je voudrais rencontrer mon professeur'],['📖','Je voudrais emprunter un manuel'],['🖥️','Puis-je avoir un soutien en sous-titres ?'],['🎧','Je porte un appareil auditif'],['📚','Où est la bibliothèque ?'],['🖨️',"Je voudrais utiliser l'imprimante"],['📅',"Quand est l'examen ?"],['🏥',"Où est l'infirmerie ?"],['🍱','Où est la cantine ?'],['🚌',"Informations sur le bus scolaire, s'il vous plaît"],['📋','Je voudrais recevoir mon bulletin'],['🎓','Je voudrais demander une bourse'],['📞',"Le contact d'urgence, s'il vous plaît"],['🚻','Où sont les toilettes ?'],
+    ],
+    'Travail': [
+      ['👂🚫',"Je suis malentendant(e)"],['✍️',"Écrivez, s'il vous plaît"],['🤟',"J'ai besoin d'un interprète en langue des signes"],['📋',"Partagez le compte rendu par message, s'il vous plaît"],['💻',"Envoyez par e-mail, s'il vous plaît"],['📅','Je voudrais vérifier le calendrier'],['📝',"Donnez les instructions par écrit, s'il vous plaît"],['🖥️','Y a-t-il un support de sous-titres ?'],['🔔',"Je n'entends pas les notifications, envoyez un message"],['📊',"Montrez le document à l'écran, s'il vous plaît"],['🤝',"Enchanté(e)"],['👋',"Je pars pour aujourd'hui"],['🏠','Puis-je travailler à domicile ?'],['📅','Je voudrais demander des congés'],['💰',"J'ai une question sur mon salaire"],['🖨️',"Où est l'imprimante ?"],['☕','Où est la cantine ?'],['🚻','Où sont les toilettes ?'],['🅿️',"Je voudrais m'inscrire pour le parking"],['♿','Où sont les installations pour handicapés ?'],
+    ],
+    'Hébergement': [
+      ['🏨',"Je voudrais m'enregistrer"],['🚪','Je voudrais régler ma note'],['👤','Voici le nom de la réservation'],['🔑','Ma clé de chambre ne fonctionne pas'],['📶','Comment me connecter au Wi-Fi ?'],['🛁',"Plus de serviettes, s'il vous plaît"],['💼',"Gardez mes bagages, s'il vous plaît"],['📱','Envoyez-moi un message (à la place du réveil)'],['🤫',"Gardez le silence, s'il vous plaît"],['🍜','Recommandez un restaurant proche'],['🧹',"Nettoyez la chambre, s'il vous plaît"],['🔌','Où est la prise électrique ?'],['❄️','La climatisation ne fonctionne pas'],['🔥','Le chauffage ne fonctionne pas'],['🛏️',"Changez les draps, s'il vous plaît"],['🪥',"Brosse à dents/dentifrice, s'il vous plaît"],['🧴',"Plus de shampooing/après-shampooing, s'il vous plaît"],['📺',"La télévision ne s'allume pas"],['🅿️','Puis-je utiliser le parking ?'],['🌅','À quelle heure commence le petit-déjeuner ?'],
+    ],
+    'Banque': [
+      ['👂🚫',"Je suis malentendant(e)"],['✍️','Pouvons-nous communiquer par écrit ?'],['💰',"Je voudrais déposer/retirer de l'argent"],['💳','Je voudrais ouvrir un compte'],['🔢','Où prend-on un numéro ?'],['📝',"J'ai besoin d'aide pour remplir les formulaires"],['🤟',"Y a-t-il un service d'interprétation en langue des signes ?"],['💸','Je voudrais faire un virement'],['🔒',"J'ai oublié mon mot de passe"],['💳',"J'ai perdu ma carte"],['🏠','Je voudrais une consultation pour un prêt'],['📊','Je voudrais consulter mon solde'],['📄',"Imprimez mon relevé de compte, s'il vous plaît"],['💱','Je voudrais changer des devises'],['📱',"Je voudrais m'inscrire à la banque mobile"],['📋','Je voudrais payer une facture'],['🏧','Où est le distributeur automatique ?'],['🔐','Réinitialiser le mot de passe de la banque en ligne'],['🐢',"Écrivez lentement, s'il vous plaît"],['🙋',"Changez de conseiller, s'il vous plaît"],
+    ],
+    'Gouvernement': [
+      ['👂🚫',"Je suis malentendant(e)"],['✍️',"Écrivez, s'il vous plaît"],['🤟','Appelez un interprète en langue des signes'],['📋',"Délivrez un certificat de résidence, s'il vous plaît"],['🪪',"J'ai apporté ma pièce d'identité"],['🔢','Où prend-on un numéro ?'],['📝',"Aidez-moi à remplir ce formulaire, s'il vous plaît"],['♿','Je voudrais demander des services pour handicapés'],['🏠',"Je voudrais enregistrer un changement d'adresse"],['💰','Je voudrais demander une aide sociale'],['📄',"Délivrez un certificat de liens familiaux, s'il vous plaît"],['🏥','Je voudrais demander une aide médicale pour handicapés'],['🚌','Je voudrais une aide transport pour handicapés'],['📋',"Délivrez un certificat de cachet, s'il vous plaît"],['🎓','Je voudrais une aide éducative pour handicapés'],['📱','Je voudrais demander une réduction sur les frais télécom'],['💳',"Réémettez ma carte de handicapé, s'il vous plaît"],['🏛️','À quel guichet dois-je aller ?'],['⏳',"Combien de temps d'attente ?"],['📅','Je voudrais prendre rendez-vous'],
+    ],
+    'Urgence': [
+      ['🆘',"À l'aide !"],['⚡',"C'est une urgence !"],['🚒',"Appelez le 15, s'il vous plaît"],['🚔',"Appelez le 17, s'il vous plaît"],['👂🚫',"Je suis malentendant(e)"],['🚑',"Appelez une ambulance, s'il vous plaît"],['😟','Je suis perdu(e)'],['👛',"J'ai perdu mon portefeuille"],['📱',"J'ai perdu mon téléphone"],['🚓','Où est le commissariat le plus proche ?'],['😰',"Quelqu'un me suit"],['🔥','Au feu !'],['💊',"J'ai pris le mauvais médicament"],['🤕','Je suis blessé(e)'],['😵',"Quelqu'un s'est évanoui"],['🌊','Il y a une inondation'],['🚗','Il y a eu un accident de la route'],['👶',"J'ai perdu un enfant"],['🏠','Je ne peux pas entrer chez moi'],['🔑',"J'ai perdu ma clé"],
+    ],
+  },
+  de: {
+    'Kommunikation': [
+      ['👂🚫','Ich bin gehörlos / schwerhörig'],['✍️','Bitte schreiben Sie es auf'],['👍','Ja'],['👎','Nein'],['🙏','Danke'],['😔','Es tut mir leid'],['🔁','Bitte wiederholen Sie das'],['🐢','Bitte sprechen Sie langsam'],['✅','Ich habe verstanden'],['❌','Ich verstehe nicht'],['✋','Einen Moment bitte'],['😅','Ich konnte das nicht hören, Entschuldigung'],['📱','Bitte schicken Sie mir eine Nachricht'],['📝','Bitte schreiben Sie auf Papier'],['🤟','Bitte rufen Sie einen Gebärdensprachdolmetscher'],['👁️','Bitte übertreiben Sie Ihre Lippenbewegungen'],['🔢','Bitte zeigen Sie mir die Zahl'],['📸','Bitte zeigen Sie mir den Bildschirm'],['💬','Kontaktieren Sie mich per Nachricht'],['🤝','Angenehm'],
+    ],
+    'Café': [
+      ['☕','Einen Eiskaffee bitte'],['🧾','Ich möchte bestellen'],['💳','Ich zahle mit Karte'],['📦','Zum Mitnehmen bitte'],['🪑','Ich trinke hier'],['🧊','Viel Eis bitte'],['🧊','Ohne Eis bitte'],['🍬','Ohne Zucker bitte'],['🥛','Ohne Sirup bitte'],['🌡️','Heiß bitte'],['📏','Große Größe bitte'],['🔄','Gibt es Nachfüllungen?'],['📶','Was ist das WLAN-Passwort?'],['🔌','Wo ist die Steckdose?'],['⏰','Wie lange ist die Wartezeit?'],['🧋','Ich möchte einen Bubble Tea'],['🎂','Haben Sie Kuchen?'],['🥤','Ist meine Bestellung fertig?'],['🗑️','Wo stelle ich den leeren Becher hin?'],['🚻','Wo ist die Toilette?'],
+    ],
+    'Restaurant': [
+      ['📋','Darf ich die Speisekarte sehen?'],['👇','Ich nehme das'],['💳','Ich zahle mit Karte'],['🧾','Die Rechnung bitte'],['📦','Zum Mitnehmen bitte'],['🪑','Haben Sie einen freien Tisch?'],['💧','Noch etwas Wasser bitte'],['🌶️','Nicht scharf bitte'],['⚠️','Ich habe eine Allergie'],['💵','Ich zahle bar'],['🔄','Gibt es Nachfüllungen?'],['⏳','Wie lange ist die Wartezeit?'],['🧊','Ohne Eis bitte'],['🔥','Heiß bitte'],['🥄','Noch etwas Besteck bitte'],['🧻','Servietten bitte'],['😋','Es war köstlich!'],['🔔','Bitte rufen Sie das Personal'],['💺','Einen Fensterplatz bitte'],['🚻','Wo ist die Toilette?'],
+    ],
+    'Einkaufen': [
+      ['💰','Wie viel kostet das?'],['💳','Akzeptieren Sie Karten?'],['🔄','Ich möchte es umtauschen'],['💸','Ich möchte eine Rückerstattung'],['📍','Wo ist es?'],['📏','Haben Sie eine andere Größe?'],['🎨','Haben Sie eine andere Farbe?'],['🛍️','Eine Tüte bitte'],['🧾','Den Kassenbon bitte'],['🏷️','Ist das im Angebot?'],['📦','Ist es vorrätig?'],['⭐','Ich habe eine Rabattkarte'],['📱','Bitte Punkte sammeln'],['🎁','Als Geschenk einpacken bitte'],['🔍','Ich suche diesen Artikel'],['💲','Haben Sie etwas Günstigeres?'],['🔖','Ist das ausverkauft?'],['🪞','Wo sind die Umkleidekabinen?'],['🅿️','Wo ist der Parkplatz?'],['🚻','Wo ist die Toilette?'],
+    ],
+    'Krankenhaus': [
+      ['👂🚫','Ich bin gehörlos / schwerhörig'],['✍️','Bitte schreiben Sie es auf'],['📅','Ich habe einen Termin'],['🤕','Hier tut es weh'],['💊','Ich brauche dieses Medikament'],['🆘','Es ist ein Notfall!'],['📄','Ich habe ein Rezept'],['🤟','Bitte verbinden Sie einen Gebärdensprachdolmetscher'],['💰','Wie viel kostet die Konsultation?'],['📅','Wann ist mein nächster Termin?'],['⚠️','Ich habe eine Allergie'],['😨','Ich habe Nebenwirkungen'],['👨‍👩‍👧','Bitte rufen Sie meinen Vormund'],['❓','Wie oft täglich?'],['🍽️','Vor oder nach den Mahlzeiten?'],['🩺','In welche Abteilung soll ich gehen?'],['📋','Bitte stellen Sie ein ärztliches Attest aus'],['💉','Brauche ich eine Spritze?'],['🚑','Bitte rufen Sie einen Krankenwagen'],['📞','Bitte schicken Sie mir die Ergebnisse per Nachricht'],
+    ],
+    'Verkehr': [
+      ['🗺️','Ich möchte hierhin'],['🚕','Bitte rufen Sie ein Taxi'],['🛑','Hier anhalten bitte'],['⏱️','Wie lange wird es dauern?'],['💳','Akzeptieren Sie Karten?'],['🚌','Fährt dieser Bus hier?'],['📍','Was ist die nächste Haltestelle?'],['🚇','Wo ist die U-Bahn-Station?'],['🔄','Muss ich umsteigen?'],['📍','Bitte fahren Sie zu dieser Adresse'],['🧳','Bitte öffnen Sie den Kofferraum'],['⚡','Bitte beeilen Sie sich (es ist dringend)'],['🧾','Den Beleg bitte'],['😟','Ich habe mich verirrt'],['🚇','Welche Linie nehme ich?'],['🎫','Ich möchte meine Fahrkarte aufladen'],['♿','Wo sind die Behindertensitze?'],['✈️','Gibt es einen Bus zum Flughafen?'],['📱','Bitte rufen Sie ein Taxi über die App'],['🚻','Wo ist die Toilette?'],
+    ],
+    'Schule': [
+      ['👂🚫','Ich bin gehörlos / schwerhörig'],['✍️','Bitte schreiben Sie es auf'],['🤟','Ich brauche Unterstützung durch einen Gebärdensprachdolmetscher'],['📋','Ich komme, um eine Aufgabe abzugeben'],['📅','Ich möchte eine Beratung vereinbaren'],['📝','Bitte überprüfen Sie meine Anwesenheit'],['🏫','Ich möchte meinen Lehrer treffen'],['📖','Ich möchte ein Lehrbuch ausleihen'],['🖥️','Kann ich Untertitelunterstützung bekommen?'],['🎧','Ich trage ein Hörgerät'],['📚','Wo ist die Bibliothek?'],['🖨️','Ich möchte den Drucker benutzen'],['📅','Wann ist die Prüfung?'],['🏥','Wo ist das Krankenzimmer?'],['🍱','Wo ist die Mensa?'],['🚌','Informationen zum Schulbus bitte'],['📋','Ich möchte mein Zeugnis erhalten'],['🎓','Ich möchte ein Stipendium beantragen'],['📞','Den Notfallkontakt bitte'],['🚻','Wo ist die Toilette?'],
+    ],
+    'Arbeit': [
+      ['👂🚫','Ich bin gehörlos / schwerhörig'],['✍️','Bitte schreiben Sie es auf'],['🤟','Ich brauche Unterstützung durch einen Gebärdensprachdolmetscher'],['📋','Bitte teilen Sie die Besprechungsnotizen per Nachricht'],['💻','Bitte senden Sie es per E-Mail'],['📅','Ich möchte den Zeitplan überprüfen'],['📝','Bitte geben Sie Anweisungen schriftlich'],['🖥️','Gibt es Untertitelunterstützung?'],['🔔','Ich höre keine Benachrichtigungen, bitte Nachricht senden'],['📊','Bitte zeigen Sie das Material auf dem Bildschirm'],['🤝','Angenehm'],['👋','Ich gehe für heute'],['🏠','Kann ich von zu Hause arbeiten?'],['📅','Ich möchte Urlaub beantragen'],['💰','Ich habe eine Frage zu meinem Gehalt'],['🖨️','Wo ist der Drucker?'],['☕','Wo ist die Kantine?'],['🚻','Wo ist die Toilette?'],['🅿️','Ich möchte mich für einen Parkplatz registrieren'],['♿','Wo sind die Behinderteneinrichtungen?'],
+    ],
+    'Unterkunft': [
+      ['🏨','Ich möchte einchecken'],['🚪','Ich möchte auschecken'],['👤','Hier ist der Reservierungsname'],['🔑','Mein Zimmerschlüssel funktioniert nicht'],['📶','Wie verbinde ich mich mit dem WLAN?'],['🛁','Noch Handtücher bitte'],['💼','Bitte bewahren Sie mein Gepäck auf'],['📱','Bitte schicken Sie mir eine Nachricht (statt Weckruf)'],['🤫','Bitte halten Sie die Ruhe'],['🍜','Empfehlen Sie ein Restaurant in der Nähe'],['🧹','Bitte reinigen Sie das Zimmer'],['🔌','Wo ist die Steckdose?'],['❄️','Die Klimaanlage funktioniert nicht'],['🔥','Die Heizung funktioniert nicht'],['🛏️','Bitte wechseln Sie die Bettwäsche'],['🪥','Zahnbürste/Zahnpasta bitte'],['🧴','Mehr Shampoo/Conditioner bitte'],['📺','Der Fernseher schaltet sich nicht ein'],['🅿️','Kann ich den Parkplatz nutzen?'],['🌅','Wann beginnt das Frühstück?'],
+    ],
+    'Bank': [
+      ['👂🚫','Ich bin gehörlos / schwerhörig'],['✍️','Können wir schriftlich kommunizieren?'],['💰','Ich möchte einzahlen/abheben'],['💳','Ich möchte ein Konto eröffnen'],['🔢','Wo ziehe ich eine Nummer?'],['📝','Ich brauche Hilfe beim Ausfüllen der Formulare'],['🤟','Gibt es einen Gebärdensprachdolmetscherdienst?'],['💸','Ich möchte Geld überweisen'],['🔒','Ich habe mein Passwort vergessen'],['💳','Ich habe meine Karte verloren'],['🏠','Ich möchte eine Kreditberatung'],['📊','Ich möchte meinen Kontostand abfragen'],['📄','Bitte drucken Sie meinen Kontoauszug'],['💱','Ich möchte Währung wechseln'],['📱','Ich möchte mich für Mobile Banking registrieren'],['📋','Ich möchte eine Rechnung bezahlen'],['🏧','Wo ist der Geldautomat?'],['🔐','Online-Banking-Passwort zurücksetzen'],['🐢','Bitte schreiben Sie langsam'],['🙋','Bitte wechseln Sie den Mitarbeiter'],
+    ],
+    'Behörde': [
+      ['👂🚫','Ich bin gehörlos / schwerhörig'],['✍️','Bitte schreiben Sie es auf'],['🤟','Bitte rufen Sie einen Gebärdensprachdolmetscher'],['📋','Bitte stellen Sie eine Meldebescheinigung aus'],['🪪','Ich habe meinen Ausweis mitgebracht'],['🔢','Wo ziehe ich eine Nummer?'],['📝','Bitte helfen Sie mir, dieses Formular auszufüllen'],['♿','Ich möchte Behindertenleistungen beantragen'],['🏠','Ich möchte eine Ummeldung vornehmen'],['💰','Ich möchte Sozialhilfe beantragen'],['📄','Bitte stellen Sie eine Familienurkunde aus'],['🏥','Ich möchte medizinische Unterstützung für Behinderte beantragen'],['🚌','Ich möchte Fahrtkosten für Behinderte beantragen'],['📋','Bitte stellen Sie eine Stempelurkunde aus'],['🎓','Ich möchte Bildungsunterstützung für Behinderte beantragen'],['📱','Ich möchte Telefongebührenermäßigung beantragen'],['💳','Bitte stellen Sie meinen Behindertenausweis neu aus'],['🏛️','Zu welchem Schalter soll ich gehen?'],['⏳','Wie lange ist die Wartezeit?'],['📅','Ich möchte einen Termin vereinbaren'],
+    ],
+    'Notfall': [
+      ['🆘','Hilfe!'],['⚡','Es ist ein Notfall!'],['🚒','Bitte rufen Sie 112'],['🚔','Bitte rufen Sie die Polizei'],['👂🚫','Ich bin gehörlos / schwerhörig'],['🚑','Bitte rufen Sie einen Krankenwagen'],['😟','Ich habe mich verirrt'],['👛','Ich habe meine Geldbörse verloren'],['📱','Ich habe mein Handy verloren'],['🚓','Wo ist die nächste Polizeistation?'],['😰','Jemand folgt mir'],['🔥','Es brennt!'],['💊','Ich habe das falsche Medikament genommen'],['🤕','Ich bin verletzt'],['😵','Jemand ist ohnmächtig geworden'],['🌊','Es gibt eine Überschwemmung'],['🚗','Es gab einen Verkehrsunfall'],['👶','Ich habe ein Kind verloren'],['🏠','Ich kann nicht in mein Haus'],['🔑','Ich habe meinen Schlüssel verloren'],
+    ],
+  },
   zh: {
     '沟通': [
       ['👂🚫','我是听障人士'],['✍️','请用文字沟通，谢谢'],['👍','是'],['👎','不是'],['🙏','谢谢'],['😔','对不起'],['🔁','请再说一遍'],['🐢','请慢慢说'],['✅','我明白了'],['❌','我不明白'],['✋','请稍等'],['😅','我没听清楚，对不起'],['📱','请发短信给我'],['📝','请写在纸上'],['🤟','请叫手语翻译'],['👁️','请夸张口型'],['🔢','请用数字告诉我'],['📸','请给我看屏幕'],['💬','请通过短信联系我'],['🤝','请多关照'],
@@ -1692,6 +1812,9 @@ const catNames = {
   en: ['Communication','Cafe','Restaurant','Shopping','Hospital','Transportation','School','Workplace','Accommodation','Bank','Government','Emergency'],
   ja: ['コミュニケーション','カフェ','レストラン','ショッピング','病院','交通','学校','職場','宿泊','銀行','行政','緊急'],
   zh: ['沟通','咖啡厅','餐厅','购物','医院','交通','学校','职场','住宿','银行','政府机构','紧急情况'],
+  es: ['Comunicación','Cafetería','Restaurante','Compras','Hospital','Transporte','Escuela','Trabajo','Alojamiento','Banco','Gobierno','Emergencia'],
+  fr: ['Communication','Café','Restaurant','Shopping','Hôpital','Transport','École','Travail','Hébergement','Banque','Gouvernement','Urgence'],
+  de: ['Kommunikation','Café','Restaurant','Einkaufen','Krankenhaus','Verkehr','Schule','Arbeit','Unterkunft','Bank','Behörde','Notfall'],
 };
 
 const catEmojis = ['💬','☕','🍽️','🛒','🏥','🚌','🎓','💼','🏨','🏦','🏛️','🚨'];
@@ -1702,6 +1825,9 @@ const langInfo = {
   en: { flag: '🇺🇸', name: 'English' },
   ja: { flag: '🇯🇵', name: '日本語' },
   zh: { flag: '🇨🇳', name: '中文' },
+  es: { flag: '🇪🇸', name: 'Español' },
+  fr: { flag: '🇫🇷', name: 'Français' },
+  de: { flag: '🇩🇪', name: 'Deutsch' },
 };
 
 // UI 문자열 번역
@@ -1805,6 +1931,105 @@ const uiText = {
     vEmoji: '😊 絵文字あり', vText: '📝 テキストのみ',
     vSelectBtn: '選択',
   },
+  es: {
+    header: '🤟 Tarjetas de Comunicación',
+    changeVersion: 'Cambiar versión',
+    fontLabel: '🔤 Fuente', fontSm: 'Pequeña', fontLg: 'Grande',
+    voiceLabel: '🔊 Voz', voiceOn: 'Activar', voiceOff: 'Desactivar',
+    langLabel: '🌐 Idioma',
+    quickInput: '✏️ Escribir y mostrar',
+    captionBtn: '🎙️ Subtítulos en vivo',
+    searchPlaceholder: '🔍 Buscar tarjetas...',
+    tabAll: 'Todo',
+    captionTitle: '🎙️ Subtítulos en vivo',
+    captionWait: 'En espera', captionListening: 'Escuchando...',
+    captionStart: '🎙️ Empezar', captionStop: '⏹️ Detener',
+    captionClear: '🗑️ Limpiar',
+    captionPlaceholder: 'El habla aparecerá aquí como subtítulos',
+    inputTitle: '✏️ Escribir y mostrar',
+    inputPlaceholder: 'Escribe lo que quieres decir...',
+    btnShow: '📢 Mostrar', btnSave: '💾 Guardar',
+    savedTitle: '💾 Tarjetas guardadas',
+    speakAgain: '🔊 Escuchar de nuevo',
+    translateLabel: '🌐 Ver en otros idiomas',
+    translateHint: 'Traduciendo...',
+    speakTranslation: '🔊 Escuchar',
+    captionTranslateHint: '🌐 Traducir subtítulos',
+    favoriteTitle: '⭐ Tarjetas favoritas',
+    favoriteAdd: '⭐ Añadir a favoritos',
+    favoriteAdded: '⭐ ¡Añadido a favoritos!',
+    favoriteAlready: '¡Ya está en favoritos!',
+    versionTitle: '🤟 Elige una versión',
+    versionSub: 'Puedes cambiarlo desde el encabezado',
+    vEmoji: '😊 Con emojis', vText: '📝 Solo texto',
+    vSelectBtn: 'Seleccionar',
+  },
+  fr: {
+    header: '🤟 Cartes de Communication',
+    changeVersion: 'Changer de version',
+    fontLabel: '🔤 Police', fontSm: 'Petite', fontLg: 'Grande',
+    voiceLabel: '🔊 Voix', voiceOn: 'Activer', voiceOff: 'Désactiver',
+    langLabel: '🌐 Langue',
+    quickInput: '✏️ Saisir et afficher',
+    captionBtn: '🎙️ Sous-titres en direct',
+    searchPlaceholder: '🔍 Rechercher...',
+    tabAll: 'Tout',
+    captionTitle: '🎙️ Sous-titres en direct',
+    captionWait: 'En attente', captionListening: 'En écoute...',
+    captionStart: '🎙️ Commencer', captionStop: '⏹️ Arrêter',
+    captionClear: '🗑️ Effacer',
+    captionPlaceholder: 'La parole apparaîtra ici en sous-titres',
+    inputTitle: '✏️ Saisir et afficher',
+    inputPlaceholder: 'Tapez ce que vous voulez dire...',
+    btnShow: '📢 Afficher', btnSave: '💾 Sauvegarder',
+    savedTitle: '💾 Cartes sauvegardées',
+    speakAgain: '🔊 Réécouter',
+    translateLabel: '🌐 Voir dans d\'autres langues',
+    translateHint: 'Traduction...',
+    speakTranslation: '🔊 Écouter',
+    captionTranslateHint: '🌐 Traduire les sous-titres',
+    favoriteTitle: '⭐ Cartes favorites',
+    favoriteAdd: '⭐ Ajouter aux favoris',
+    favoriteAdded: '⭐ Ajouté aux favoris !',
+    favoriteAlready: 'Déjà dans les favoris !',
+    versionTitle: '🤟 Choisissez une version',
+    versionSub: 'Vous pouvez le changer depuis l\'en-tête',
+    vEmoji: '😊 Avec emojis', vText: '📝 Texte seulement',
+    vSelectBtn: 'Sélectionner',
+  },
+  de: {
+    header: '🤟 Kommunikationskarten',
+    changeVersion: 'Version ändern',
+    fontLabel: '🔤 Schrift', fontSm: 'Klein', fontLg: 'Groß',
+    voiceLabel: '🔊 Stimme', voiceOn: 'Ein', voiceOff: 'Aus',
+    langLabel: '🌐 Sprache',
+    quickInput: '✏️ Eingeben und anzeigen',
+    captionBtn: '🎙️ Live-Untertitel',
+    searchPlaceholder: '🔍 Karten suchen...',
+    tabAll: 'Alle',
+    captionTitle: '🎙️ Live-Untertitel',
+    captionWait: 'Bereit', captionListening: 'Höre zu...',
+    captionStart: '🎙️ Zuhören starten', captionStop: '⏹️ Stoppen',
+    captionClear: '🗑️ Löschen',
+    captionPlaceholder: 'Gesprochenes erscheint hier als Untertitel',
+    inputTitle: '✏️ Eingeben und anzeigen',
+    inputPlaceholder: 'Geben Sie ein, was Sie sagen möchten...',
+    btnShow: '📢 Anzeigen', btnSave: '💾 Speichern',
+    savedTitle: '💾 Gespeicherte Karten',
+    speakAgain: '🔊 Nochmal hören',
+    translateLabel: '🌐 In anderen Sprachen anzeigen',
+    translateHint: 'Übersetze...',
+    speakTranslation: '🔊 Hören',
+    captionTranslateHint: '🌐 Untertitel übersetzen',
+    favoriteTitle: '⭐ Favoritenkarten',
+    favoriteAdd: '⭐ Zu Favoriten hinzufügen',
+    favoriteAdded: '⭐ Zu Favoriten hinzugefügt!',
+    favoriteAlready: 'Bereits in den Favoriten!',
+    versionTitle: '🤟 Version wählen',
+    versionSub: 'Sie können es jederzeit über die Kopfzeile ändern',
+    vEmoji: '😊 Mit Emojis', vText: '📝 Nur Text',
+    vSelectBtn: 'Auswählen',
+  },
   zh: {
     header: '🤟 快速沟通卡片',
     changeVersion: '切换版本',
@@ -1864,7 +2089,7 @@ async function translateFreeText(text, targetLang) {
   const cacheKey = text + '__' + currentLang + '__' + targetLang;
   if (translateCache[cacheKey]) return translateCache[cacheKey];
 
-  const langCode = { ko: 'ko', en: 'en', ja: 'ja', zh: 'zh-CN' };
+  const langCode = { ko: 'ko', en: 'en', ja: 'ja', zh: 'zh-CN', es: 'es', fr: 'fr', de: 'de' };
   const from = langCode[currentLang];
   const to = langCode[targetLang];
 
@@ -1892,7 +2117,7 @@ async function translateWithClaude(text, targetLang) {
 function buildModalTranslateBtns() {
   const container = document.getElementById('modalTranslateBtns');
   container.innerHTML = '';
-  const allLangs = ['ko', 'en', 'ja', 'zh'];
+  const allLangs = ['ko', 'en', 'ja', 'zh', 'es', 'fr', 'de'];
   allLangs.filter(l => l !== currentLang).forEach(lang => {
     const btn = document.createElement('button');
     btn.className = 'modal-translate-btn';
@@ -1966,7 +2191,7 @@ function buildCaptionTranslateBtns() {
   label.textContent = uiText[currentLang].captionTranslateHint + ':';
   container.appendChild(label);
 
-  const allLangs = ['ko', 'en', 'ja', 'zh'];
+  const allLangs = ['ko', 'en', 'ja', 'zh', 'es', 'fr', 'de'];
   allLangs.forEach(lang => {
     const btn = document.createElement('button');
     btn.className = 'caption-translate-btn';
@@ -2019,11 +2244,14 @@ function setLang(lang) {
   localStorage.setItem('lang', lang);
   cards = allCards[lang];
 
-  ['ko','en','ja','zh'].forEach(l => {
+  ['ko','en','ja','zh','es','fr','de'].forEach(l => {
     document.getElementById('lang-' + l).classList.toggle('active', l === lang);
   });
 
-  if (recognition) { recognition.lang = lang === 'ko' ? 'ko-KR' : lang === 'en' ? 'en-US' : lang === 'ja' ? 'ja-JP' : 'zh-CN'; }
+  if (recognition) {
+    const langMap = { ko:'ko-KR', en:'en-US', ja:'ja-JP', zh:'zh-CN', es:'es-ES', fr:'fr-FR', de:'de-DE' };
+    recognition.lang = langMap[lang] || 'ko-KR';
+  }
 
   applyUIText();
   rebuildSections();
@@ -2269,10 +2497,13 @@ const previewTexts = {
   en: ['May I see the menu?','I will pay by card','I am deaf','Thank you'],
   ja: ['メニューを見せてください','カードで支払います','私は聴覚障害者です','ありがとうございます'],
   zh: ['请给我看菜单','我用卡付款','我是听障人士','谢谢'],
+  es: ['¿Puedo ver el menú?','Pagaré con tarjeta','Soy sordo/a','Gracias'],
+  fr: ['Puis-je voir le menu ?','Je paierai par carte','Je suis sourd(e)','Merci'],
+  de: ['Darf ich die Speisekarte sehen?','Ich zahle mit Karte','Ich bin gehörlos','Danke'],
 };
 
 function setVersionLang(lang) {
-  ['ko','en','ja','zh'].forEach(l => {
+  ['ko','en','ja','zh','es','fr','de'].forEach(l => {
     const btn = document.getElementById('vlang-' + l);
     if (btn) btn.classList.toggle('active', l === lang);
   });
@@ -2443,7 +2674,7 @@ function speakLang(text, lang) {
   if (typeof speechSynthesis === 'undefined') return;
   speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
-  const langMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' };
+  const langMap = { ko:'ko-KR', en:'en-US', ja:'ja-JP', zh:'zh-CN', es:'es-ES', fr:'fr-FR', de:'de-DE' };
   utter.lang = langMap[lang] || 'ko-KR';
   utter.pitch = 1.0;
   utter.rate = 0.92;
@@ -2456,7 +2687,7 @@ function speak(text) {
   if (btn) btn.classList.add('speaking');
   speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
-  const langMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' };
+  const langMap = { ko:'ko-KR', en:'en-US', ja:'ja-JP', zh:'zh-CN', es:'es-ES', fr:'fr-FR', de:'de-DE' };
   utter.lang = langMap[currentLang] || 'ko-KR';
   utter.pitch = 1.0;
   utter.rate = 0.92;
