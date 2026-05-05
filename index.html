@@ -2635,7 +2635,7 @@ function startListening() {
   }
 
   recognition = new SpeechRecognition();
-  const langMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' };
+  const langMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN', es: 'es-ES', fr: 'fr-FR', de: 'de-DE' };
   recognition.lang = langMap[currentLang] || 'ko-KR';
   captionSourceLang = currentLang; // 자막 소스 언어 저장
   recognition.continuous = true;
