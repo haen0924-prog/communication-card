@@ -2585,6 +2585,7 @@ let recognition = null;
 let isListening = false;
 let finalText = '';
 let captionSourceLang = 'ko'; // 자막 음성인식 언어
+let lastFinalText = ''; // 안드로이드 중복 방지
 
 function updateCaptionSize(val) {
   document.getElementById('captionScreen').style.setProperty('--caption-font-size', val + 'px');
@@ -2653,28 +2654,14 @@ function startListening() {
     }
   };
 
-  // 안드로이드 중복 방지용 변수
-  let lastFinalText = '';
-
   recognition.onresult = (event) => {
     let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript.trim();
+      const transcript = event.results[i][0].transcript;
       if (event.results[i].isFinal) {
-        // 안드로이드 중복 방지: 이미 finalText에 포함된 내용이면 무시
-        if (transcript && !finalText.trimEnd().endsWith(transcript)) {
-          finalText += transcript + ' ';
-        }
+        finalText += transcript;
       } else {
-        // interim 중복 방지: finalText 끝부분과 겹치는 내용 제거
-        const trimmedFinal = finalText.trim();
-        if (trimmedFinal && transcript.startsWith(trimmedFinal.slice(-Math.min(20, trimmedFinal.length)))) {
-          // 겹치는 부분 제거
-          const overlap = trimmedFinal.slice(-Math.min(20, trimmedFinal.length));
-          interim += transcript.replace(overlap, '').trim();
-        } else {
-          interim += transcript;
-        }
+        interim += transcript;
       }
     }
     document.getElementById('captionFinal').textContent = finalText;
