@@ -45,6 +45,8 @@
     padding: 32px 24px 24px;
     max-width: 400px;
     width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0,0,0,0.4);
     position: relative;
   }
@@ -1601,7 +1603,8 @@
       <div class="welcome-title">의사소통 카드에<br>오신 걸 환영해요!</div>
       <div class="welcome-subtitle">이 앱은 <strong>청각장애인의 의사소통</strong>을<br>돕기 위해 만들었어요.</div>
     </div>
-    <div class="welcome-features">
+    <!-- 간단 버전 (처음 팝업) -->
+    <div class="welcome-features" id="welcomeSimple">
       <div class="welcome-feature">
         <span class="welcome-feature-icon">📋</span>
         <div class="welcome-feature-text">
@@ -1627,7 +1630,60 @@
         <span class="welcome-feature-icon">🎙️</span>
         <div class="welcome-feature-text">
           <div class="welcome-feature-title">실시간 자막</div>
-          <div class="welcome-feature-desc">오른쪽 하단 마이크 버튼을 누르면 상대방 말을 자막으로 확인할 수 있어요</div>
+          <div class="welcome-feature-desc">오른쪽 하단 🎙️ 버튼을 누르면 상대방 말을 자막으로 확인할 수 있어요</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 상세 버전 (사용법 버튼) -->
+    <div class="welcome-features" id="welcomeDetail" style="display:none;">
+      <div class="welcome-feature">
+        <span class="welcome-feature-icon">📋</span>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">카드 선택</div>
+          <div class="welcome-feature-desc">상황별 카드를 눌러 상대방에게 보여주세요. 카드를 길게 누르면 숨기기·즐겨찾기 옵션이 나와요</div>
+        </div>
+      </div>
+      <div class="welcome-feature">
+        <span class="welcome-feature-icon">✏️</span>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">직접 입력</div>
+          <div class="welcome-feature-desc">상단 입력 버튼으로 하고 싶은 말을 직접 써서 보여주세요. 자주 쓰는 문장은 저장할 수 있어요</div>
+        </div>
+      </div>
+      <div class="welcome-feature">
+        <span class="welcome-feature-icon">⭐</span>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">자주 쓰는 카드 저장</div>
+          <div class="welcome-feature-desc">카드를 길게 눌러 즐겨찾기에 추가하면 검색창 바로 아래에서 빠르게 사용할 수 있어요</div>
+        </div>
+      </div>
+      <div class="welcome-feature">
+        <span class="welcome-feature-icon">🔍</span>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">카드 검색</div>
+          <div class="welcome-feature-desc">찾고 싶은 카드를 검색창에 입력하면 빠르게 찾을 수 있어요</div>
+        </div>
+      </div>
+      <div class="welcome-feature">
+        <span class="welcome-feature-icon">🌐</span>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">언어 변경 · 번역</div>
+          <div class="welcome-feature-desc">상단에서 언어를 선택하면 카드가 해당 언어로 바뀌어요. 카드를 누르면 다른 언어로 번역해서 보여줄 수 있어요</div>
+        </div>
+      </div>
+      <div class="welcome-feature">
+        <span class="welcome-feature-icon">🎙️</span>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">실시간 자막</div>
+          <div class="welcome-feature-desc">오른쪽 하단 🎙️ 버튼을 누르면 상대방 말을 자막으로 바로 확인할 수 있어요. 전체화면에서는 다른 언어로 번역도 가능해요</div>
+        </div>
+      </div>
+      <div class="welcome-feature">
+        <span class="welcome-feature-icon">📲</span>
+        <div class="welcome-feature-text">
+          <div class="welcome-feature-title">앱처럼 사용하기</div>
+          <div class="welcome-feature-desc">브라우저 메뉴에서 "홈 화면에 추가"를 선택하면 앱처럼 바로 실행할 수 있어요</div>
         </div>
       </div>
     </div>
@@ -1635,7 +1691,7 @@
       <span style="font-size:18px; flex-shrink:0;">⚠️</span>
       <div class="welcome-warning-text">실시간 자막 <strong>번역</strong>은 무료 서비스를 사용하여 번역 품질이 낮을 수 있어요. 참고용으로만 활용해 주세요.</div>
     </div>
-    <button class="welcome-btn" onclick="closeWelcome()">시작하기 🤟</button>
+    <button class="welcome-btn" id="welcomeCloseBtn" onclick="closeWelcome()">시작하기 🤟</button>
     <div style="text-align:center; margin-top:14px;">
       <a href="mailto:haen0924@gmail.com" style="font-size:12px; color:#94a3b8; text-decoration:none;">
         💌 의견 · 피드백 보내기
@@ -1691,7 +1747,10 @@
 
 <header>
   <h1 id="headerTitle">🤟 의사소통 카드</h1>
-  <button class="btn-change-version" id="btnChangeVersion" onclick="openVersionSelect()">버전 변경</button>
+  <div style="display:flex; justify-content:center; gap:8px; margin-top:6px;">
+    <button class="btn-change-version" id="btnChangeVersion" onclick="openVersionSelect()">버전 변경</button>
+    <button class="btn-change-version" onclick="openHelp()">❓ 사용법</button>
+  </div>
 </header>
 
 <!-- 설정 바 -->
@@ -2037,14 +2096,30 @@ function stopMiniListening() {
   updateMiniCaptionUI();
 }
 
-// ── 웰컴 팝업 ──────────────────────────────
+// ── 웰컴 팝업 / 도움말 ──────────────────────
+let isHelpMode = false;
+
 function closeWelcome() {
   document.getElementById('welcomeOverlay').classList.remove('show');
   localStorage.setItem('welcomeShown', '1');
+  // 간단 버전으로 복원
+  document.getElementById('welcomeCloseBtn').textContent = '시작하기 🤟';
+  document.getElementById('welcomeSimple').style.display = '';
+  document.getElementById('welcomeDetail').style.display = 'none';
+}
+
+function openHelp() {
+  isHelpMode = true;
+  document.getElementById('welcomeCloseBtn').textContent = '✕ 닫기';
+  document.getElementById('welcomeSimple').style.display = 'none';
+  document.getElementById('welcomeDetail').style.display = '';
+  document.getElementById('welcomeOverlay').classList.add('show');
 }
 
 function checkWelcome() {
   if (!localStorage.getItem('welcomeShown')) {
+    isHelpMode = false;
+    document.getElementById('welcomeCloseBtn').textContent = '시작하기 🤟';
     document.getElementById('welcomeOverlay').classList.add('show');
   }
 }
