@@ -3268,25 +3268,32 @@ function startNewSession() {
   recognition = new SpeechRecognition();
   const langMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN', es: 'es-ES', fr: 'fr-FR', de: 'de-DE' };
   recognition.lang = langMap[currentLang] || 'ko-KR';
-  recognition.continuous = false;  // 세션 단위로 관리 (안드로이드 중복 방지 핵심)
+  recognition.continuous = false;
   recognition.interimResults = true;
 
-  let sessionFinal = '';  // 이번 세션에서 확정된 텍스트
+  let sessionFinal = '';
+  let lastInterim = '';
 
   recognition.onresult = (event) => {
+    // event.resultIndex부터만 처리 (이미 처리한 결과 건너뜀)
+    let newFinal = '';
     let interim = '';
-    sessionFinal = '';
-    for (let i = 0; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript;
+
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
       if (event.results[i].isFinal) {
-        sessionFinal += transcript;
+        newFinal += t;
+        lastInterim = '';
       } else {
-        interim += transcript;
+        interim += t;
       }
     }
-    // 화면엔 누적 + 현재 세션 표시
+
+    if (newFinal) sessionFinal += newFinal;
+    if (interim) lastInterim = interim;
+
     document.getElementById('captionFinal').textContent = finalText + sessionFinal;
-    document.getElementById('captionInterim').textContent = interim;
+    document.getElementById('captionInterim').textContent = lastInterim;
     const el = document.getElementById('captionFinal').parentElement;
     el.scrollTop = el.scrollHeight;
 
@@ -3303,24 +3310,21 @@ function startNewSession() {
       alert('마이크 권한이 필요해요.\n브라우저 설정에서 마이크를 허용해 주세요.');
       stopListening();
     }
-    // no-speech 등 다른 오류는 onend에서 재시작 처리
   };
 
   recognition.onend = () => {
-    // 세션 종료: sessionFinal을 finalText에 합산
     if (sessionFinal) {
       finalText += sessionFinal + ' ';
-      sessionFinal = '';
       document.getElementById('captionFinal').textContent = finalText;
+      document.getElementById('captionInterim').textContent = '';
     }
-    // 새 객체로 재시작 → 이전 results 없는 깨끗한 세션 시작
-    if (isListening) {
-      setTimeout(startNewSession, 150);
-    }
+    if (isListening) setTimeout(startNewSession, 150);
   };
 
   recognition.start();
 }
+
+
 
 
 function stopListening() {
