@@ -1902,6 +1902,12 @@ let miniFinalText = '';
 let miniCaptionOpen = false;
 
 function toggleMiniCaption() {
+  // 카드 모달이 열려있으면 먼저 닫기
+  const modal = document.getElementById('modal');
+  if (modal.classList.contains('show')) {
+    speechSynthesis.cancel();
+    modal.classList.remove('show');
+  }
   if (miniCaptionOpen) {
     closeMiniCaption();
   } else {
