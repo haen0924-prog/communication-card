@@ -1972,6 +1972,7 @@ let miniRecognition = null;
 let miniIsListening = false;
 let miniFinalText = '';
 let miniCaptionOpen = false;
+let miniAddedTranscripts = new Set();
 
 function toggleMiniCaption() {
   // 카드 모달이 열려있으면 먼저 닫기
@@ -1989,6 +1990,7 @@ function toggleMiniCaption() {
 
 function openMiniCaption() {
   miniCaptionOpen = true;
+  miniAddedTranscripts = new Set();
   document.getElementById('miniCaptionBar').classList.add('show');
   document.body.classList.add('mini-caption-open');
   document.getElementById('floatingCaptionBtn').classList.add('listening');
@@ -2017,6 +2019,7 @@ function goFullscreenCaption() {
 
 function clearMiniCaption() {
   miniFinalText = '';
+  miniAddedTranscripts = new Set();
   document.getElementById('miniCaptionText').textContent = '';
   document.getElementById('miniCaptionInterim').textContent = '';
 }
@@ -2068,8 +2071,6 @@ function startMiniListening() {
     }
   };
 
-  let miniProcessedFinalCount = 0;
-
   miniRecognition.onresult = (event) => {
     let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -2078,9 +2079,10 @@ function startMiniListening() {
       if (!transcript) continue;
 
       if (result.isFinal) {
-        if (i < miniProcessedFinalCount) continue;
-        miniProcessedFinalCount = i + 1;
-        miniFinalText += transcript + ' ';
+        if (!miniAddedTranscripts.has(transcript)) {
+          miniAddedTranscripts.add(transcript);
+          miniFinalText += transcript + ' ';
+        }
       } else {
         interim += transcript;
       }
@@ -3191,6 +3193,7 @@ let isListening = false;
 let finalText = '';
 let captionSourceLang = 'ko'; // 자막 음성인식 언어
 let lastFinalText = ''; // 안드로이드 중복 방지
+let addedTranscripts = new Set(); // 이미 추가된 문장 추적
 
 function updateCaptionSize(val) {
   document.getElementById('captionScreen').style.setProperty('--caption-font-size', val + 'px');
@@ -3201,6 +3204,7 @@ function updateCaptionSize(val) {
 function openCaptionScreen() {
   document.getElementById('captionScreen').classList.add('show');
   finalText = '';
+  addedTranscripts = new Set();
   document.getElementById('captionFinal').textContent = uiText[currentLang].captionPlaceholder;
   document.getElementById('captionInterim').textContent = '';
   document.getElementById('captionTranslationResult').classList.remove('show');
@@ -3219,6 +3223,7 @@ function closeCaptionScreen() {
 function clearCaption() {
   finalText = '';
   lastFinalText = '';
+  addedTranscripts = new Set();
   document.getElementById('captionFinal').textContent = '';
   document.getElementById('captionInterim').textContent = '';
   document.getElementById('captionTranslationResult').classList.remove('show');
@@ -3259,9 +3264,6 @@ function startListening() {
     }
   };
 
-  // 안드로이드 중복 방지: 이미 처리한 final 결과 수 추적
-  let processedFinalCount = 0;
-
   recognition.onresult = (event) => {
     let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -3270,10 +3272,12 @@ function startListening() {
       if (!transcript) continue;
 
       if (result.isFinal) {
-        // 이미 처리한 final 결과면 무시 (안드로이드 재시작시 중복 방지)
-        if (i < processedFinalCount) continue;
-        processedFinalCount = i + 1;
-        finalText += transcript + ' ';
+        // 핵심: 이미 finalText에 포함된 문장이면 무시
+        // 안드로이드가 재시작 후 이전 결과를 다시 보낼 때 차단
+        if (!addedTranscripts.has(transcript)) {
+          addedTranscripts.add(transcript);
+          finalText += transcript + ' ';
+        }
       } else {
         interim += transcript;
       }
