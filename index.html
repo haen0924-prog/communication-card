@@ -2068,25 +2068,25 @@ function startMiniListening() {
     }
   };
 
+  let miniProcessedFinalCount = 0;
+
   miniRecognition.onresult = (event) => {
     let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript.trim();
-      if (event.results[i].isFinal) {
-        if (transcript && !miniFinalText.trimEnd().endsWith(transcript)) {
-          miniFinalText += transcript + ' ';
-        }
+      const result = event.results[i];
+      const transcript = result[0].transcript.trim();
+      if (!transcript) continue;
+
+      if (result.isFinal) {
+        if (i < miniProcessedFinalCount) continue;
+        miniProcessedFinalCount = i + 1;
+        miniFinalText += transcript + ' ';
       } else {
-        if (miniFinalText && transcript.startsWith(miniFinalText.trim())) {
-          interim += transcript.slice(miniFinalText.trim().length).trim();
-        } else {
-          interim += transcript;
-        }
+        interim += transcript;
       }
     }
     document.getElementById('miniCaptionText').textContent = miniFinalText;
     document.getElementById('miniCaptionInterim').textContent = interim;
-    // 미니 자막 바디 스크롤
     const el = document.getElementById('miniCaptionBody') || document.getElementById('miniCaptionText').parentElement;
     el.scrollTop = el.scrollHeight;
   };
@@ -3259,22 +3259,23 @@ function startListening() {
     }
   };
 
+  // 안드로이드 중복 방지: 이미 처리한 final 결과 수 추적
+  let processedFinalCount = 0;
+
   recognition.onresult = (event) => {
     let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript.trim();
-      if (event.results[i].isFinal) {
-        // 안드로이드 중복 방지: 이미 끝부분에 같은 내용이 있으면 무시
-        if (transcript && !finalText.trimEnd().endsWith(transcript)) {
-          finalText += transcript + ' ';
-        }
+      const result = event.results[i];
+      const transcript = result[0].transcript.trim();
+      if (!transcript) continue;
+
+      if (result.isFinal) {
+        // 이미 처리한 final 결과면 무시 (안드로이드 재시작시 중복 방지)
+        if (i < processedFinalCount) continue;
+        processedFinalCount = i + 1;
+        finalText += transcript + ' ';
       } else {
-        // interim이 finalText와 중복되면 중복 부분 제거
-        if (finalText && transcript.startsWith(finalText.trim())) {
-          interim += transcript.slice(finalText.trim().length).trim();
-        } else {
-          interim += transcript;
-        }
+        interim += transcript;
       }
     }
     document.getElementById('captionFinal').textContent = finalText;
