@@ -386,9 +386,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 32px 28px 24px;
-    overflow: hidden;
+    justify-content: flex-start;
+    padding: 24px 28px 16px;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .caption-final {
@@ -398,8 +399,6 @@
     line-height: 1.4;
     text-align: center;
     word-break: keep-all;
-    max-height: 60vh;
-    overflow-y: auto;
     width: 100%;
     transition: font-size 0.15s;
   }
@@ -1946,7 +1945,7 @@
       <button class="mini-caption-close-btn" onclick="closeMiniCaption()">✕</button>
     </div>
   </div>
-  <div class="mini-caption-body">
+  <div class="mini-caption-body" id="miniCaptionBody">
     <div class="mini-caption-text" id="miniCaptionText"></div>
     <div class="mini-caption-interim" id="miniCaptionInterim"></div>
   </div>
@@ -2072,16 +2071,23 @@ function startMiniListening() {
   miniRecognition.onresult = (event) => {
     let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript;
+      const transcript = event.results[i][0].transcript.trim();
       if (event.results[i].isFinal) {
-        miniFinalText += transcript;
+        if (transcript && !miniFinalText.trimEnd().endsWith(transcript)) {
+          miniFinalText += transcript + ' ';
+        }
       } else {
-        interim += transcript;
+        if (miniFinalText && transcript.startsWith(miniFinalText.trim())) {
+          interim += transcript.slice(miniFinalText.trim().length).trim();
+        } else {
+          interim += transcript;
+        }
       }
     }
     document.getElementById('miniCaptionText').textContent = miniFinalText;
     document.getElementById('miniCaptionInterim').textContent = interim;
-    const el = document.getElementById('miniCaptionText');
+    // 미니 자막 바디 스크롤
+    const el = document.getElementById('miniCaptionBody') || document.getElementById('miniCaptionText').parentElement;
     el.scrollTop = el.scrollHeight;
   };
 
@@ -3256,16 +3262,24 @@ function startListening() {
   recognition.onresult = (event) => {
     let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript;
+      const transcript = event.results[i][0].transcript.trim();
       if (event.results[i].isFinal) {
-        finalText += transcript;
+        // 안드로이드 중복 방지: 이미 끝부분에 같은 내용이 있으면 무시
+        if (transcript && !finalText.trimEnd().endsWith(transcript)) {
+          finalText += transcript + ' ';
+        }
       } else {
-        interim += transcript;
+        // interim이 finalText와 중복되면 중복 부분 제거
+        if (finalText && transcript.startsWith(finalText.trim())) {
+          interim += transcript.slice(finalText.trim().length).trim();
+        } else {
+          interim += transcript;
+        }
       }
     }
     document.getElementById('captionFinal').textContent = finalText;
     document.getElementById('captionInterim').textContent = interim;
-    const el = document.getElementById('captionFinal');
+    const el = document.getElementById('captionFinal').parentElement;
     el.scrollTop = el.scrollHeight;
 
     // 번역 버튼이 활성화된 상태면 자동 재번역 (내용 바뀔 때만)
