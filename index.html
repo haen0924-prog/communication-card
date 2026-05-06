@@ -142,7 +142,7 @@
     position: fixed;
     bottom: 24px;
     right: 20px;
-    z-index: 600;
+    z-index: 1001;
     width: 56px;
     height: 56px;
     border-radius: 50%;
@@ -3276,7 +3276,6 @@ function showCard(emoji, text, catIndex, cardIndex) {
   buildModalTranslateBtns();
 
   document.getElementById('modal').classList.add('show');
-  document.getElementById('floatingCaptionBtn').style.display = 'none';
   speak(text);
   applyEmojiMode();
 }
@@ -3284,10 +3283,6 @@ function showCard(emoji, text, catIndex, cardIndex) {
 function closeModal() {
   speechSynthesis.cancel();
   document.getElementById('modal').classList.remove('show');
-  // 미니 자막 팝업이 닫혀있을 때만 플로팅 버튼 다시 표시
-  if (!miniCaptionOpen) {
-    document.getElementById('floatingCaptionBtn').style.display = '';
-  }
 }
 
 // 탭 필터
