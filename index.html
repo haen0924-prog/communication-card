@@ -1704,6 +1704,10 @@
       <span style="font-size:18px; flex-shrink:0;">⚠️</span>
       <div class="welcome-warning-text">실시간 자막 <strong>번역</strong>은 무료 서비스를 사용하여 번역 품질이 낮을 수 있어요. 참고용으로만 활용해 주세요.</div>
     </div>
+    <div class="welcome-warning" id="androidWarningPopup" style="display:none; margin-top:8px;">
+      <span style="font-size:18px; flex-shrink:0;">📱</span>
+      <div class="welcome-warning-text"><strong>안드로이드</strong>에서는 실시간 자막이 불안정할 수 있어요.</div>
+    </div>
     <button class="welcome-btn" id="welcomeCloseBtn" onclick="closeWelcome()">시작하기 🤟</button>
     <div style="text-align:center; margin-top:14px;">
       <a href="mailto:haen0924@gmail.com" style="font-size:12px; color:#94a3b8; text-decoration:none;">
@@ -1844,6 +1848,9 @@
       </div>
       <button class="caption-close-btn" onclick="closeCaptionScreen()">✕</button>
     </div>
+    <div id="androidWarningFull" style="display:none; padding:8px 16px; background:#1e293b; border-bottom:1px solid #334155;">
+      <span style="font-size:11px; color:#fbbf24;">⚠️ 안드로이드에서는 자막이 불안정할 수 있어요.</span>
+    </div>
 
     <div class="caption-body">
       <div class="caption-final" id="captionFinal">상대방의 말이 여기에 자막으로 나타납니다</div>
@@ -1945,6 +1952,9 @@
       <button class="mini-caption-close-btn" onclick="closeMiniCaption()">✕</button>
     </div>
   </div>
+  <div id="androidWarningMini" style="display:none; padding:6px 14px; background:#fef3c7; border-bottom:1px solid #fcd34d;">
+    <span style="font-size:11px; color:#92400e;">⚠️ 안드로이드에서는 자막이 불안정할 수 있어요.</span>
+  </div>
   <div class="mini-caption-body" id="miniCaptionBody">
     <div class="mini-caption-text" id="miniCaptionText"></div>
     <div class="mini-caption-interim" id="miniCaptionInterim"></div>
@@ -1992,6 +2002,9 @@ function openMiniCaption() {
   miniCaptionOpen = true;
   miniAddedTranscripts = new Set();
   document.getElementById('miniCaptionBar').classList.add('show');
+  // 안드로이드 감지
+  const isAndroid = /android/i.test(navigator.userAgent);
+  document.getElementById('androidWarningMini').style.display = isAndroid ? 'block' : 'none';
   document.body.classList.add('mini-caption-open');
   document.getElementById('floatingCaptionBtn').classList.add('listening');
   // 플로팅 버튼 숨기기 (팝업 열리면 필요없음)
@@ -2124,10 +2137,14 @@ let isHelpMode = false;
 function closeWelcome() {
   document.getElementById('welcomeOverlay').classList.remove('show');
   localStorage.setItem('welcomeShown', '1');
-  // 간단 버전으로 복원
   document.getElementById('welcomeCloseBtn').textContent = '시작하기 🤟';
   document.getElementById('welcomeSimple').style.display = '';
   document.getElementById('welcomeDetail').style.display = 'none';
+}
+
+function showAndroidWarning() {
+  const isAndroid = /android/i.test(navigator.userAgent);
+  document.getElementById('androidWarningPopup').style.display = isAndroid ? 'flex' : 'none';
 }
 
 function openHelp() {
@@ -2136,6 +2153,7 @@ function openHelp() {
   document.getElementById('welcomeSimple').style.display = 'none';
   document.getElementById('welcomeDetail').style.display = '';
   document.getElementById('welcomeOverlay').classList.add('show');
+  showAndroidWarning();
 }
 
 function checkWelcome() {
@@ -2143,6 +2161,7 @@ function checkWelcome() {
     isHelpMode = false;
     document.getElementById('welcomeCloseBtn').textContent = '시작하기 🤟';
     document.getElementById('welcomeOverlay').classList.add('show');
+    showAndroidWarning();
   }
 }
 
@@ -3203,6 +3222,9 @@ function updateCaptionSize(val) {
 
 function openCaptionScreen() {
   document.getElementById('captionScreen').classList.add('show');
+  // 안드로이드 감지
+  const isAndroid = /android/i.test(navigator.userAgent);
+  document.getElementById('androidWarningFull').style.display = isAndroid ? 'block' : 'none';
   finalText = '';
   addedTranscripts = new Set();
   document.getElementById('captionFinal').textContent = uiText[currentLang].captionPlaceholder;
