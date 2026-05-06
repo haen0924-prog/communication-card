@@ -2144,7 +2144,14 @@ function closeWelcome() {
 
 function showAndroidWarning() {
   const isAndroid = /android/i.test(navigator.userAgent);
-  document.getElementById('androidWarningPopup').style.display = isAndroid ? 'flex' : 'none';
+  const popup = document.getElementById('androidWarningPopup');
+  if (popup) {
+    popup.style.display = isAndroid ? 'flex' : 'none';
+    const t = uiText[currentLang];
+    if (t && t.androidWarningPopup) {
+      popup.querySelector('.welcome-warning-text').textContent = t.androidWarningPopup;
+    }
+  }
 }
 
 function openHelp() {
@@ -2489,6 +2496,8 @@ const uiText = {
     translateHint: '번역 중...',
     speakTranslation: '🔊 듣기',
     captionTranslateHint: '🌐 자막 번역',
+    androidWarningCaption: '⚠️ 안드로이드에서는 자막이 불안정할 수 있어요.',
+    androidWarningPopup: '📱 안드로이드에서는 실시간 자막이 불안정할 수 있어요.',
     versionTitle: '🤟 버전을 선택해 주세요',
     versionSub: '언제든지 헤더의 버튼으로 바꿀 수 있어요',
     vEmoji: '😊 이모지 있는 버전', vText: '📝 이모지 없는 버전',
@@ -2522,6 +2531,8 @@ const uiText = {
     translateHint: 'Translating...',
     speakTranslation: '🔊 Listen',
     captionTranslateHint: '🌐 Translate Caption',
+    androidWarningCaption: '⚠️ Captions may be unstable on Android.',
+    androidWarningPopup: '📱 Live captions may be unstable on Android.',
     versionTitle: '🤟 Choose a Version',
     versionSub: 'You can change it anytime from the header',
     vEmoji: '😊 With Emojis', vText: '📝 Text Only',
@@ -2555,6 +2566,8 @@ const uiText = {
     translateHint: '翻訳中...',
     speakTranslation: '🔊 聞く',
     captionTranslateHint: '🌐 字幕翻訳',
+    androidWarningCaption: '⚠️ Androidでは字幕が不安定になる場合があります。',
+    androidWarningPopup: '📱 Androidではリアルタイム字幕が不安定になる場合があります。',
     versionTitle: '🤟 バージョンを選んでください',
     versionSub: 'いつでもヘッダーのボタンで変更できます',
     vEmoji: '😊 絵文字あり', vText: '📝 テキストのみ',
@@ -2584,6 +2597,8 @@ const uiText = {
     translateHint: 'Traduciendo...',
     speakTranslation: '🔊 Escuchar',
     captionTranslateHint: '🌐 Traducir subtítulos',
+    androidWarningCaption: '⚠️ Los subtítulos pueden ser inestables en Android.',
+    androidWarningPopup: '📱 Los subtítulos en vivo pueden ser inestables en Android.',
     favoriteTitle: '⭐ Tarjetas favoritas',
     favoriteAdd: '⭐ Añadir a favoritos',
     favoriteAdded: '⭐ ¡Añadido a favoritos!',
@@ -2617,6 +2632,8 @@ const uiText = {
     translateHint: 'Traduction...',
     speakTranslation: '🔊 Écouter',
     captionTranslateHint: '🌐 Traduire les sous-titres',
+    androidWarningCaption: '⚠️ Les sous-titres peuvent être instables sur Android.',
+    androidWarningPopup: '📱 Les sous-titres en direct peuvent être instables sur Android.',
     favoriteTitle: '⭐ Cartes favorites',
     favoriteAdd: '⭐ Ajouter aux favoris',
     favoriteAdded: '⭐ Ajouté aux favoris !',
@@ -2650,6 +2667,8 @@ const uiText = {
     translateHint: 'Übersetze...',
     speakTranslation: '🔊 Hören',
     captionTranslateHint: '🌐 Untertitel übersetzen',
+    androidWarningCaption: '⚠️ Untertitel können auf Android instabil sein.',
+    androidWarningPopup: '📱 Live-Untertitel können auf Android instabil sein.',
     favoriteTitle: '⭐ Favoritenkarten',
     favoriteAdd: '⭐ Zu Favoriten hinzufügen',
     favoriteAdded: '⭐ Zu Favoriten hinzugefügt!',
@@ -2687,6 +2706,8 @@ const uiText = {
     translateHint: '翻译中...',
     speakTranslation: '🔊 收听',
     captionTranslateHint: '🌐 翻译字幕',
+    androidWarningCaption: '⚠️ 在安卓设备上，字幕可能不稳定。',
+    androidWarningPopup: '📱 在安卓设备上，实时字幕可能不稳定。',
     versionTitle: '🤟 请选择版本',
     versionSub: '随时可通过顶部按钮更改',
     vEmoji: '😊 有表情符号', vText: '📝 仅文字',
@@ -2968,6 +2989,15 @@ function applyUIText() {
   set('savedSectionTitle', t.savedTitle);
   set('favoriteTitleEl', t.favoriteTitle);
   set('ctxFavoriteBtn', t.favoriteAdd);
+  // 안드로이드 경고 문구 업데이트
+  if (t.androidWarningCaption) {
+    const warnMini = document.getElementById('androidWarningMini');
+    const warnFull = document.getElementById('androidWarningFull');
+    const warnPopup = document.getElementById('androidWarningPopup');
+    if (warnMini) warnMini.querySelector('span').textContent = t.androidWarningCaption;
+    if (warnFull) warnFull.querySelector('span').textContent = t.androidWarningCaption;
+    if (warnPopup) warnPopup.querySelector('.welcome-warning-text').textContent = t.androidWarningPopup;
+  }
   set('modalTranslateLabel', t.translateLabel);
   set('versionTitle', t.versionTitle);
   set('versionSubtitle', t.versionSub);
