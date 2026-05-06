@@ -3220,6 +3220,35 @@ function closeCaptionScreen() {
   document.getElementById('captionScreen').classList.remove('show');
 }
 
+
+// 반복되는 텍스트 제거 (안드로이드 Chrome 버그 대응)
+function deduplicateText(text) {
+  if (!text || text.length < 2) return text;
+  const words = text.trim().split(/\s+/);
+  if (words.length < 2) return text;
+
+  // 슬라이딩 윈도우로 반복 패턴 탐지
+  // "A B C A B C" → "A B C", "안녕 안녕 안녕" → "안녕"
+  for (let patLen = 1; patLen <= Math.floor(words.length / 2); patLen++) {
+    const pattern = words.slice(0, patLen);
+    let isRepeat = true;
+    for (let i = patLen; i < words.length; i++) {
+      if (words[i] !== pattern[i % patLen]) {
+        isRepeat = false;
+        break;
+      }
+    }
+    if (isRepeat) return pattern.join(' ');
+  }
+
+  // 연속 중복 단어만 제거
+  const result = [words[0]];
+  for (let i = 1; i < words.length; i++) {
+    if (words[i] !== result[result.length - 1]) result.push(words[i]);
+  }
+  return result.join(' ');
+}
+
 function clearCaption() {
   finalText = '';
   lastFinalText = '';
@@ -3292,8 +3321,8 @@ function startNewSession() {
     if (newFinal) sessionFinal += newFinal;
     if (interim) lastInterim = interim;
 
-    document.getElementById('captionFinal').textContent = finalText + sessionFinal;
-    document.getElementById('captionInterim').textContent = lastInterim;
+    document.getElementById('captionFinal').textContent = finalText + deduplicateText(sessionFinal);
+    document.getElementById('captionInterim').textContent = deduplicateText(lastInterim);
     const el = document.getElementById('captionFinal').parentElement;
     el.scrollTop = el.scrollHeight;
 
@@ -3314,7 +3343,7 @@ function startNewSession() {
 
   recognition.onend = () => {
     if (sessionFinal) {
-      finalText += sessionFinal + ' ';
+      finalText += deduplicateText(sessionFinal) + ' ';
       document.getElementById('captionFinal').textContent = finalText;
       document.getElementById('captionInterim').textContent = '';
     }
