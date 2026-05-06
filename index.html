@@ -1710,9 +1710,7 @@
     </div>
     <button class="welcome-btn" id="welcomeCloseBtn" onclick="closeWelcome()">시작하기 🤟</button>
     <div style="text-align:center; margin-top:14px;">
-      <a href="mailto:haen0924@gmail.com" style="font-size:12px; color:#94a3b8; text-decoration:none;">
-        💌 의견 · 피드백 보내기
-      </a>
+      <a href="mailto:haen0924@gmail.com" id="popupFeedback" style="font-size:12px; color:#94a3b8; text-decoration:none;">💌 의견 · 피드백 보내기</a>
     </div>
   </div>
 </div>
@@ -2505,6 +2503,8 @@ const uiText = {
     features: [["📋","카드 선택","상황별 카드로 소통하세요"],["✏️","직접 입력","하고 싶은 말을 직접 써서 보여주세요"],["⭐","자주 쓰는 카드 저장","카드를 길게 눌러 즐겨찾기에 저장하세요"],["🎙️","실시간 자막","오른쪽 하단 🎙️ 버튼을 누르면 상대방 말을 자막으로 확인할 수 있어요"]],
     detailFeatures: [["📋","카드 선택","상황별 카드를 눌러 상대방에게 보여주세요. 카드를 길게 누르면 숨기기·즐겨찾기 옵션이 나와요"],["✏️","직접 입력","상단 입력 버튼으로 하고 싶은 말을 직접 써서 보여주세요. 자주 쓰는 문장은 저장할 수 있어요"],["⭐","자주 쓰는 카드 저장","카드를 길게 눌러 즐겨찾기에 추가하면 검색창 바로 아래에서 빠르게 사용할 수 있어요"],["🔍","카드 검색","찾고 싶은 카드를 검색창에 입력하면 빠르게 찾을 수 있어요"],["🌐","언어 변경 · 번역","상단에서 언어를 선택하면 카드가 해당 언어로 바뀌어요. 카드를 누르면 다른 언어로 번역해서 보여줄 수 있어요"],["🎙️","실시간 자막","오른쪽 하단 🎙️ 버튼을 누르면 상대방 말을 자막으로 바로 확인할 수 있어요. 전체화면에서는 다른 언어로 번역도 가능해요"],["📲","앱처럼 사용하기","브라우저 메뉴에서 홈 화면에 추가를 선택하면 앱처럼 바로 실행할 수 있어요"]],
     warningText: `실시간 자막 번역은 무료 서비스를 사용하여 번역 품질이 낮을 수 있어요. 참고용으로만 활용해 주세요.`,
+    feedbackText: '💌 의견이나 피드백이 있으시면 메일 주세요 · haen0924@gmail.com',
+    popupFeedback: '💌 의견 · 피드백 보내기',
     helpBtn: '❓ 사용법',
     fullscreen: '⛶ 전체화면',
     miniClear: '🗑️ 지우기',
@@ -2551,6 +2551,8 @@ const uiText = {
     features: [["📋","Select a Card","Communicate using situation-based cards"],["✏️","Type & Show","Type what you want to say and show it"],["⭐","Save Favorites","Long-press a card to save it to favorites"],["🎙️","Live Captions","Tap the 🎙️ button at the bottom right to see live captions"]],
     detailFeatures: [["📋","Select a Card","Tap a card to show it. Long-press for hide/favorite options"],["✏️","Type & Show","Use the input button at the top. Frequently used phrases can be saved"],["⭐","Save Favorites","Long-press a card to add it to favorites for quick access below the search bar"],["🔍","Search Cards","Type in the search bar to quickly find the card you need"],["🌐","Language & Translation","Select a language at the top to switch all cards. Tap a card to translate it"],["🎙️","Live Captions","Tap the 🎙️ button at the bottom right. Fullscreen mode also supports translation"],["📲","Use Like an App","Select Add to Home Screen in your browser menu"]],
     warningText: `Live caption translation uses a free service and may be inaccurate. Please use it for reference only.`,
+    feedbackText: '💌 Have feedback? Send us an email · haen0924@gmail.com',
+    popupFeedback: '💌 Send feedback',
     helpBtn: '❓ Help',
     fullscreen: '⛶ Fullscreen',
     miniClear: '🗑️ Clear',
@@ -2597,6 +2599,8 @@ const uiText = {
     features: [["📋","カードを選ぶ","状況別カードでコミュニケーション"],["✏️","直接入力","伝えたいことを入力して見せましょう"],["⭐","よく使うカードを保存","カードを長押しでお気に入りに保存"],["🎙️","リアルタイム字幕","右下の🎙️ボタンで相手の言葉を字幕で確認"]],
     detailFeatures: [["📋","カードを選ぶ","カードをタップして相手に見せましょう。長押しで非表示・お気に入りオプションが表示されます"],["✏️","直接入力","上部の入力ボタンで伝えたいことを入力できます。よく使う文は保存できます"],["⭐","よく使うカードを保存","カードを長押しでお気に入りに追加すると、検索バーのすぐ下から素早くアクセスできます"],["🔍","カードを検索","検索バーに入力して必要なカードを素早く見つけられます"],["🌐","言語変更・翻訳","上部で言語を選ぶとカードが切り替わります。カードをタップすると他の言語に翻訳できます"],["🎙️","リアルタイム字幕","右下の🎙️ボタンで字幕を確認できます。全画面では翻訳も可能です"],["📲","アプリのように使う","ブラウザメニューのホーム画面に追加でアプリのように起動できます"]],
     warningText: `リアルタイム字幕の翻訳は無料サービスを使用しており、翻訳品質が低い場合があります。参考程度にご利用ください。`,
+    feedbackText: '💌 ご意見・ご感想はメールでどうぞ · haen0924@gmail.com',
+    popupFeedback: '💌 フィードバックを送る',
     helpBtn: '❓ 使い方',
     fullscreen: '⛶ 全画面',
     miniClear: '🗑️ クリア',
@@ -2639,6 +2643,8 @@ const uiText = {
     features: [["📋","Seleccionar tarjeta","Comuníquese con tarjetas por situación"],["✏️","Escribir y mostrar","Escriba lo que quiere decir y muéstrelo"],["⭐","Guardar favoritos","Mantenga presionada una tarjeta para guardarla"],["🎙️","Subtítulos en vivo","Toque el botón 🎙️ abajo a la derecha"]],
     detailFeatures: [["📋","Seleccionar tarjeta","Toque una tarjeta para mostrarla. Mantenga presionada para ocultar/favoritos"],["✏️","Escribir y mostrar","Use el botón de entrada superior. Las frases frecuentes se pueden guardar"],["⭐","Guardar favoritos","Mantenga presionada una tarjeta para agregarla a favoritos"],["🔍","Buscar tarjetas","Escriba en la barra de búsqueda para encontrar la tarjeta que necesita"],["🌐","Idioma y traducción","Seleccione un idioma arriba para cambiar las tarjetas. Toque una tarjeta para traducirla"],["🎙️","Subtítulos en vivo","Toque el botón 🎙️ abajo a la derecha. En pantalla completa también puede traducir"],["📲","Usar como app","Seleccione Agregar a inicio en el menú del navegador"]],
     warningText: `La traducción de subtítulos usa un servicio gratuito y puede ser imprecisa. Úsela solo como referencia.`,
+    feedbackText: '💌 ¿Tienes comentarios? Envíanos un correo · haen0924@gmail.com',
+    popupFeedback: '💌 Enviar comentarios',
     helpBtn: '❓ Ayuda',
     fullscreen: '⛶ Pantalla completa',
     miniClear: '🗑️ Limpiar',
@@ -2685,6 +2691,8 @@ const uiText = {
     features: [["📋","Choisir une carte","Communiquez avec des cartes par situation"],["✏️","Saisir et afficher","Tapez ce que vous voulez dire et montrez-le"],["⭐","Sauvegarder les favoris","Appuyez longuement sur une carte pour la sauvegarder"],["🎙️","Sous-titres en direct","Appuyez sur le bouton 🎙️ en bas à droite"]],
     detailFeatures: [["📋","Choisir une carte","Appuyez sur une carte pour la montrer. Appui long pour masquer/favoris"],["✏️","Saisir et afficher","Utilisez le bouton de saisie en haut. Les phrases fréquentes peuvent être sauvegardées"],["⭐","Sauvegarder les favoris","Appui long sur une carte pour l'ajouter aux favoris"],["🔍","Rechercher des cartes","Tapez dans la barre de recherche pour trouver la carte souhaitée"],["🌐","Langue et traduction","Sélectionnez une langue en haut. Appuyez sur une carte pour la traduire"],["🎙️","Sous-titres en direct","Appuyez sur le bouton 🎙️ en bas à droite. En plein écran, la traduction est aussi disponible"],["📲","Utiliser comme une app","Sélectionnez Ajouter à l'écran d'accueil dans le menu du navigateur"]],
     warningText: `La traduction des sous-titres utilise un service gratuit et peut être imprécise. Utilisez-la uniquement à titre indicatif.`,
+    feedbackText: '💌 Des commentaires ? Envoyez-nous un e-mail · haen0924@gmail.com',
+    popupFeedback: '💌 Envoyer un retour',
     helpBtn: '❓ Aide',
     fullscreen: '⛶ Plein écran',
     miniClear: '🗑️ Effacer',
@@ -2731,6 +2739,8 @@ const uiText = {
     features: [["📋","Karte auswählen","Kommunizieren Sie mit situationsbezogenen Karten"],["✏️","Eingeben und anzeigen","Geben Sie ein, was Sie sagen möchten"],["⭐","Favoriten speichern","Lange drücken um eine Karte zu speichern"],["🎙️","Live-Untertitel","Tippen Sie auf den 🎙️-Button unten rechts"]],
     detailFeatures: [["📋","Karte auswählen","Tippen Sie auf eine Karte. Lange drücken für Ausblenden/Favoriten"],["✏️","Eingeben und anzeigen","Verwenden Sie die Eingabeschaltfläche oben. Häufig verwendete Sätze können gespeichert werden"],["⭐","Favoriten speichern","Lange drücken um eine Karte zu den Favoriten hinzuzufügen"],["🔍","Karten suchen","Geben Sie in der Suchleiste ein um die gewünschte Karte zu finden"],["🌐","Sprache und Übersetzung","Wählen Sie oben eine Sprache aus. Tippen Sie auf eine Karte um sie zu übersetzen"],["🎙️","Live-Untertitel","Tippen Sie auf den 🎙️-Button unten rechts. Im Vollbildmodus ist auch Übersetzung möglich"],["📲","Wie eine App verwenden","Wählen Sie Zum Startbildschirm hinzufügen im Browser-Menü"]],
     warningText: `Die Untertitelübersetzung verwendet einen kostenlosen Dienst und kann ungenau sein. Bitte nur als Referenz verwenden.`,
+    feedbackText: '💌 Haben Sie Feedback? Schreiben Sie uns · haen0924@gmail.com',
+    popupFeedback: '💌 Feedback senden',
     helpBtn: '❓ Hilfe',
     fullscreen: '⛶ Vollbild',
     miniClear: '🗑️ Löschen',
@@ -2781,6 +2791,8 @@ const uiText = {
     features: [["📋","选择卡片","使用场景卡片进行沟通"],["✏️","直接输入","输入您想表达的内容并展示"],["⭐","保存常用卡片","长按卡片可保存到收藏夹"],["🎙️","实时字幕","点击右下角🎙️按钮查看实时字幕"]],
     detailFeatures: [["📋","选择卡片","点击卡片展示给对方。长按可显示隐藏/收藏选项"],["✏️","直接输入","使用顶部输入按钮输入想说的话。常用句子可以保存"],["⭐","保存常用卡片","长按卡片添加到收藏夹，可在搜索栏下方快速使用"],["🔍","搜索卡片","在搜索栏输入即可快速找到所需卡片"],["🌐","切换语言·翻译","在顶部选择语言可切换所有卡片。点击卡片可翻译成其他语言"],["🎙️","实时字幕","点击右下角🎙️按钮查看实时字幕。全屏模式下还支持翻译"],["📲","像应用一样使用","在浏览器菜单选择添加到主屏幕，即可像应用一样启动"]],
     warningText: `实时字幕翻译使用免费服务，翻译质量可能较低。请仅作参考使用。`,
+    feedbackText: '💌 有任何意见或反馈，请发送邮件 · haen0924@gmail.com',
+    popupFeedback: '💌 发送反馈',
     helpBtn: '❓ 使用说明',
     fullscreen: '⛶ 全屏',
     miniClear: '🗑️ 清除',
@@ -3069,6 +3081,11 @@ function applyUIText() {
   set('favoriteTitleEl', t.favoriteTitle);
   set('ctxFavoriteBtn', t.favoriteAdd);
   set('btnHelp', t.helpBtn);
+  // 피드백 문구 업데이트
+  const feedbackEl = document.getElementById('footerFeedback');
+  if (feedbackEl && t.feedbackText) feedbackEl.textContent = t.feedbackText;
+  const popupFeedbackEl = document.getElementById('popupFeedback');
+  if (popupFeedbackEl && t.popupFeedback) popupFeedbackEl.textContent = t.popupFeedback;
   set('btnMiniFullscreen', t.fullscreen);
   set('btnMiniClear', t.miniClear);
   set('captionSizeLabel', t.fontSize);
