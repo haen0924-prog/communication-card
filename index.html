@@ -1766,7 +1766,7 @@
   <h1 id="headerTitle">🤟 의사소통 카드</h1>
   <div style="display:flex; justify-content:center; gap:8px; margin-top:8px;">
     <button class="btn-change-version" id="btnChangeVersion" onclick="openVersionSelect()">🔄 버전 변경</button>
-    <button class="btn-help-btn" onclick="openHelp()">❓ 사용법</button>
+    <button class="btn-help-btn" id="btnHelp" onclick="openHelp()">❓ 사용법</button>
   </div>
 </header>
 
@@ -1869,7 +1869,7 @@
     </div>
 
     <div class="caption-size-bar">
-      <span class="caption-size-label">🔤 글자 크기</span>
+      <span class="caption-size-label" id="captionSizeLabel">🔤 글자 크기</span>
       <input type="range" class="caption-size-slider" id="captionSizeSlider"
         min="24" max="100" value="52" oninput="updateCaptionSize(this.value)">
       <span class="caption-size-value" id="captionSizeValue">52px</span>
@@ -1948,7 +1948,7 @@
       <span id="miniCaptionStatusText">🎙️ 실시간 자막</span>
     </div>
     <div class="mini-caption-actions">
-      <button class="mini-caption-fullscreen-btn" onclick="goFullscreenCaption()">⛶ 전체화면</button>
+      <button class="mini-caption-fullscreen-btn" id="btnMiniFullscreen" onclick="goFullscreenCaption()">⛶ 전체화면</button>
       <button class="mini-caption-close-btn" onclick="closeMiniCaption()">✕</button>
     </div>
   </div>
@@ -1963,7 +1963,7 @@
     <button class="mini-caption-toggle-btn" id="miniCaptionToggleBtn" onclick="toggleMiniListening()">
       🎙️ 듣기 시작
     </button>
-    <button class="mini-caption-clear-btn" onclick="clearMiniCaption()">🗑️ 지우기</button>
+    <button class="mini-caption-clear-btn" id="btnMiniClear" onclick="clearMiniCaption()">🗑️ 지우기</button>
   </div>
 </div>
 
@@ -2156,9 +2156,10 @@ function showAndroidWarning() {
 
 function openHelp() {
   isHelpMode = true;
-  document.getElementById('welcomeCloseBtn').textContent = '✕ 닫기';
   document.getElementById('welcomeSimple').style.display = 'none';
   document.getElementById('welcomeDetail').style.display = '';
+  // 현재 언어로 팝업 내용 업데이트
+  applyUIText();
   document.getElementById('welcomeOverlay').classList.add('show');
   showAndroidWarning();
 }
@@ -2166,7 +2167,8 @@ function openHelp() {
 function checkWelcome() {
   if (!localStorage.getItem('welcomeShown')) {
     isHelpMode = false;
-    document.getElementById('welcomeCloseBtn').textContent = '시작하기 🤟';
+    // 저장된 언어로 팝업 내용 업데이트
+    applyUIText();
     document.getElementById('welcomeOverlay').classList.add('show');
     showAndroidWarning();
   }
@@ -2496,6 +2498,17 @@ const uiText = {
     translateHint: '번역 중...',
     speakTranslation: '🔊 듣기',
     captionTranslateHint: '🌐 자막 번역',
+    welcomeTitle: `의사소통 카드에\n오신 걸 환영해요!`,
+    welcomeSubtitle: `이 앱은 <strong>청각장애인의 의사소통</strong>을<br>돕기 위해 만들었어요.`,
+    startBtn: '시작하기 🤟',
+    closeBtn: '✕ 닫기',
+    features: [["📋","카드 선택","상황별 카드로 소통하세요"],["✏️","직접 입력","하고 싶은 말을 직접 써서 보여주세요"],["⭐","자주 쓰는 카드 저장","카드를 길게 눌러 즐겨찾기에 저장하세요"],["🎙️","실시간 자막","오른쪽 하단 🎙️ 버튼을 누르면 상대방 말을 자막으로 확인할 수 있어요"]],
+    detailFeatures: [["📋","카드 선택","상황별 카드를 눌러 상대방에게 보여주세요. 카드를 길게 누르면 숨기기·즐겨찾기 옵션이 나와요"],["✏️","직접 입력","상단 입력 버튼으로 하고 싶은 말을 직접 써서 보여주세요. 자주 쓰는 문장은 저장할 수 있어요"],["⭐","자주 쓰는 카드 저장","카드를 길게 눌러 즐겨찾기에 추가하면 검색창 바로 아래에서 빠르게 사용할 수 있어요"],["🔍","카드 검색","찾고 싶은 카드를 검색창에 입력하면 빠르게 찾을 수 있어요"],["🌐","언어 변경 · 번역","상단에서 언어를 선택하면 카드가 해당 언어로 바뀌어요. 카드를 누르면 다른 언어로 번역해서 보여줄 수 있어요"],["🎙️","실시간 자막","오른쪽 하단 🎙️ 버튼을 누르면 상대방 말을 자막으로 바로 확인할 수 있어요. 전체화면에서는 다른 언어로 번역도 가능해요"],["📲","앱처럼 사용하기","브라우저 메뉴에서 홈 화면에 추가를 선택하면 앱처럼 바로 실행할 수 있어요"]],
+    warningText: `실시간 자막 번역은 무료 서비스를 사용하여 번역 품질이 낮을 수 있어요. 참고용으로만 활용해 주세요.`,
+    helpBtn: '❓ 사용법',
+    fullscreen: '⛶ 전체화면',
+    miniClear: '🗑️ 지우기',
+    fontSize: '🔤 글자 크기',
     androidWarningCaption: '⚠️ 안드로이드에서는 자막이 불안정할 수 있어요.',
     androidWarningPopup: '📱 안드로이드에서는 실시간 자막이 불안정할 수 있어요.',
     versionTitle: '🤟 버전을 선택해 주세요',
@@ -2531,6 +2544,17 @@ const uiText = {
     translateHint: 'Translating...',
     speakTranslation: '🔊 Listen',
     captionTranslateHint: '🌐 Translate Caption',
+    welcomeTitle: `Welcome to\nCommunication Cards!`,
+    welcomeSubtitle: `This app was created to help<br><strong>people with hearing impairments</strong> communicate.`,
+    startBtn: 'Get Started 🤟',
+    closeBtn: '✕ Close',
+    features: [["📋","Select a Card","Communicate using situation-based cards"],["✏️","Type & Show","Type what you want to say and show it"],["⭐","Save Favorites","Long-press a card to save it to favorites"],["🎙️","Live Captions","Tap the 🎙️ button at the bottom right to see live captions"]],
+    detailFeatures: [["📋","Select a Card","Tap a card to show it. Long-press for hide/favorite options"],["✏️","Type & Show","Use the input button at the top. Frequently used phrases can be saved"],["⭐","Save Favorites","Long-press a card to add it to favorites for quick access below the search bar"],["🔍","Search Cards","Type in the search bar to quickly find the card you need"],["🌐","Language & Translation","Select a language at the top to switch all cards. Tap a card to translate it"],["🎙️","Live Captions","Tap the 🎙️ button at the bottom right. Fullscreen mode also supports translation"],["📲","Use Like an App","Select Add to Home Screen in your browser menu"]],
+    warningText: `Live caption translation uses a free service and may be inaccurate. Please use it for reference only.`,
+    helpBtn: '❓ Help',
+    fullscreen: '⛶ Fullscreen',
+    miniClear: '🗑️ Clear',
+    fontSize: '🔤 Font Size',
     androidWarningCaption: '⚠️ Captions may be unstable on Android.',
     androidWarningPopup: '📱 Live captions may be unstable on Android.',
     versionTitle: '🤟 Choose a Version',
@@ -2566,6 +2590,17 @@ const uiText = {
     translateHint: '翻訳中...',
     speakTranslation: '🔊 聞く',
     captionTranslateHint: '🌐 字幕翻訳',
+    welcomeTitle: `コミュニケーションカードへ\nようこそ！`,
+    welcomeSubtitle: `このアプリは<strong>聴覚障害者のコミュニケーション</strong>を<br>サポートするために作られました。`,
+    startBtn: 'はじめる 🤟',
+    closeBtn: '✕ 閉じる',
+    features: [["📋","カードを選ぶ","状況別カードでコミュニケーション"],["✏️","直接入力","伝えたいことを入力して見せましょう"],["⭐","よく使うカードを保存","カードを長押しでお気に入りに保存"],["🎙️","リアルタイム字幕","右下の🎙️ボタンで相手の言葉を字幕で確認"]],
+    detailFeatures: [["📋","カードを選ぶ","カードをタップして相手に見せましょう。長押しで非表示・お気に入りオプションが表示されます"],["✏️","直接入力","上部の入力ボタンで伝えたいことを入力できます。よく使う文は保存できます"],["⭐","よく使うカードを保存","カードを長押しでお気に入りに追加すると、検索バーのすぐ下から素早くアクセスできます"],["🔍","カードを検索","検索バーに入力して必要なカードを素早く見つけられます"],["🌐","言語変更・翻訳","上部で言語を選ぶとカードが切り替わります。カードをタップすると他の言語に翻訳できます"],["🎙️","リアルタイム字幕","右下の🎙️ボタンで字幕を確認できます。全画面では翻訳も可能です"],["📲","アプリのように使う","ブラウザメニューのホーム画面に追加でアプリのように起動できます"]],
+    warningText: `リアルタイム字幕の翻訳は無料サービスを使用しており、翻訳品質が低い場合があります。参考程度にご利用ください。`,
+    helpBtn: '❓ 使い方',
+    fullscreen: '⛶ 全画面',
+    miniClear: '🗑️ クリア',
+    fontSize: '🔤 文字サイズ',
     androidWarningCaption: '⚠️ Androidでは字幕が不安定になる場合があります。',
     androidWarningPopup: '📱 Androidではリアルタイム字幕が不安定になる場合があります。',
     versionTitle: '🤟 バージョンを選んでください',
@@ -2597,6 +2632,17 @@ const uiText = {
     translateHint: 'Traduciendo...',
     speakTranslation: '🔊 Escuchar',
     captionTranslateHint: '🌐 Traducir subtítulos',
+    welcomeTitle: `¡Bienvenido a\nTarjetas de Comunicación!`,
+    welcomeSubtitle: `Esta app fue creada para ayudar a<br><strong>personas con discapacidad auditiva</strong> a comunicarse.`,
+    startBtn: 'Comenzar 🤟',
+    closeBtn: '✕ Cerrar',
+    features: [["📋","Seleccionar tarjeta","Comuníquese con tarjetas por situación"],["✏️","Escribir y mostrar","Escriba lo que quiere decir y muéstrelo"],["⭐","Guardar favoritos","Mantenga presionada una tarjeta para guardarla"],["🎙️","Subtítulos en vivo","Toque el botón 🎙️ abajo a la derecha"]],
+    detailFeatures: [["📋","Seleccionar tarjeta","Toque una tarjeta para mostrarla. Mantenga presionada para ocultar/favoritos"],["✏️","Escribir y mostrar","Use el botón de entrada superior. Las frases frecuentes se pueden guardar"],["⭐","Guardar favoritos","Mantenga presionada una tarjeta para agregarla a favoritos"],["🔍","Buscar tarjetas","Escriba en la barra de búsqueda para encontrar la tarjeta que necesita"],["🌐","Idioma y traducción","Seleccione un idioma arriba para cambiar las tarjetas. Toque una tarjeta para traducirla"],["🎙️","Subtítulos en vivo","Toque el botón 🎙️ abajo a la derecha. En pantalla completa también puede traducir"],["📲","Usar como app","Seleccione Agregar a inicio en el menú del navegador"]],
+    warningText: `La traducción de subtítulos usa un servicio gratuito y puede ser imprecisa. Úsela solo como referencia.`,
+    helpBtn: '❓ Ayuda',
+    fullscreen: '⛶ Pantalla completa',
+    miniClear: '🗑️ Limpiar',
+    fontSize: '🔤 Tamaño de fuente',
     androidWarningCaption: '⚠️ Los subtítulos pueden ser inestables en Android.',
     androidWarningPopup: '📱 Los subtítulos en vivo pueden ser inestables en Android.',
     favoriteTitle: '⭐ Tarjetas favoritas',
@@ -2632,6 +2678,17 @@ const uiText = {
     translateHint: 'Traduction...',
     speakTranslation: '🔊 Écouter',
     captionTranslateHint: '🌐 Traduire les sous-titres',
+    welcomeTitle: `Bienvenue dans\nCartes de Communication !`,
+    welcomeSubtitle: `Cette app a été créée pour aider<br><strong>les personnes malentendantes</strong> à communiquer.`,
+    startBtn: 'Commencer 🤟',
+    closeBtn: '✕ Fermer',
+    features: [["📋","Choisir une carte","Communiquez avec des cartes par situation"],["✏️","Saisir et afficher","Tapez ce que vous voulez dire et montrez-le"],["⭐","Sauvegarder les favoris","Appuyez longuement sur une carte pour la sauvegarder"],["🎙️","Sous-titres en direct","Appuyez sur le bouton 🎙️ en bas à droite"]],
+    detailFeatures: [["📋","Choisir une carte","Appuyez sur une carte pour la montrer. Appui long pour masquer/favoris"],["✏️","Saisir et afficher","Utilisez le bouton de saisie en haut. Les phrases fréquentes peuvent être sauvegardées"],["⭐","Sauvegarder les favoris","Appui long sur une carte pour l'ajouter aux favoris"],["🔍","Rechercher des cartes","Tapez dans la barre de recherche pour trouver la carte souhaitée"],["🌐","Langue et traduction","Sélectionnez une langue en haut. Appuyez sur une carte pour la traduire"],["🎙️","Sous-titres en direct","Appuyez sur le bouton 🎙️ en bas à droite. En plein écran, la traduction est aussi disponible"],["📲","Utiliser comme une app","Sélectionnez Ajouter à l'écran d'accueil dans le menu du navigateur"]],
+    warningText: `La traduction des sous-titres utilise un service gratuit et peut être imprécise. Utilisez-la uniquement à titre indicatif.`,
+    helpBtn: '❓ Aide',
+    fullscreen: '⛶ Plein écran',
+    miniClear: '🗑️ Effacer',
+    fontSize: '🔤 Taille de police',
     androidWarningCaption: '⚠️ Les sous-titres peuvent être instables sur Android.',
     androidWarningPopup: '📱 Les sous-titres en direct peuvent être instables sur Android.',
     favoriteTitle: '⭐ Cartes favorites',
@@ -2667,6 +2724,17 @@ const uiText = {
     translateHint: 'Übersetze...',
     speakTranslation: '🔊 Hören',
     captionTranslateHint: '🌐 Untertitel übersetzen',
+    welcomeTitle: `Willkommen bei\nKommunikationskarten!`,
+    welcomeSubtitle: `Diese App wurde entwickelt, um<br><strong>Menschen mit Hörbehinderung</strong> bei der Kommunikation zu helfen.`,
+    startBtn: 'Loslegen 🤟',
+    closeBtn: '✕ Schließen',
+    features: [["📋","Karte auswählen","Kommunizieren Sie mit situationsbezogenen Karten"],["✏️","Eingeben und anzeigen","Geben Sie ein, was Sie sagen möchten"],["⭐","Favoriten speichern","Lange drücken um eine Karte zu speichern"],["🎙️","Live-Untertitel","Tippen Sie auf den 🎙️-Button unten rechts"]],
+    detailFeatures: [["📋","Karte auswählen","Tippen Sie auf eine Karte. Lange drücken für Ausblenden/Favoriten"],["✏️","Eingeben und anzeigen","Verwenden Sie die Eingabeschaltfläche oben. Häufig verwendete Sätze können gespeichert werden"],["⭐","Favoriten speichern","Lange drücken um eine Karte zu den Favoriten hinzuzufügen"],["🔍","Karten suchen","Geben Sie in der Suchleiste ein um die gewünschte Karte zu finden"],["🌐","Sprache und Übersetzung","Wählen Sie oben eine Sprache aus. Tippen Sie auf eine Karte um sie zu übersetzen"],["🎙️","Live-Untertitel","Tippen Sie auf den 🎙️-Button unten rechts. Im Vollbildmodus ist auch Übersetzung möglich"],["📲","Wie eine App verwenden","Wählen Sie Zum Startbildschirm hinzufügen im Browser-Menü"]],
+    warningText: `Die Untertitelübersetzung verwendet einen kostenlosen Dienst und kann ungenau sein. Bitte nur als Referenz verwenden.`,
+    helpBtn: '❓ Hilfe',
+    fullscreen: '⛶ Vollbild',
+    miniClear: '🗑️ Löschen',
+    fontSize: '🔤 Schriftgröße',
     androidWarningCaption: '⚠️ Untertitel können auf Android instabil sein.',
     androidWarningPopup: '📱 Live-Untertitel können auf Android instabil sein.',
     favoriteTitle: '⭐ Favoritenkarten',
@@ -2706,6 +2774,17 @@ const uiText = {
     translateHint: '翻译中...',
     speakTranslation: '🔊 收听',
     captionTranslateHint: '🌐 翻译字幕',
+    welcomeTitle: `欢迎使用\n沟通卡片！`,
+    welcomeSubtitle: `这款应用是为了帮助<strong>听障人士沟通</strong>而开发的。`,
+    startBtn: '开始使用 🤟',
+    closeBtn: '✕ 关闭',
+    features: [["📋","选择卡片","使用场景卡片进行沟通"],["✏️","直接输入","输入您想表达的内容并展示"],["⭐","保存常用卡片","长按卡片可保存到收藏夹"],["🎙️","实时字幕","点击右下角🎙️按钮查看实时字幕"]],
+    detailFeatures: [["📋","选择卡片","点击卡片展示给对方。长按可显示隐藏/收藏选项"],["✏️","直接输入","使用顶部输入按钮输入想说的话。常用句子可以保存"],["⭐","保存常用卡片","长按卡片添加到收藏夹，可在搜索栏下方快速使用"],["🔍","搜索卡片","在搜索栏输入即可快速找到所需卡片"],["🌐","切换语言·翻译","在顶部选择语言可切换所有卡片。点击卡片可翻译成其他语言"],["🎙️","实时字幕","点击右下角🎙️按钮查看实时字幕。全屏模式下还支持翻译"],["📲","像应用一样使用","在浏览器菜单选择添加到主屏幕，即可像应用一样启动"]],
+    warningText: `实时字幕翻译使用免费服务，翻译质量可能较低。请仅作参考使用。`,
+    helpBtn: '❓ 使用说明',
+    fullscreen: '⛶ 全屏',
+    miniClear: '🗑️ 清除',
+    fontSize: '🔤 字体大小',
     androidWarningCaption: '⚠️ 在安卓设备上，字幕可能不稳定。',
     androidWarningPopup: '📱 在安卓设备上，实时字幕可能不稳定。',
     versionTitle: '🤟 请选择版本',
@@ -2989,6 +3068,36 @@ function applyUIText() {
   set('savedSectionTitle', t.savedTitle);
   set('favoriteTitleEl', t.favoriteTitle);
   set('ctxFavoriteBtn', t.favoriteAdd);
+  set('btnHelp', t.helpBtn);
+  set('btnMiniFullscreen', t.fullscreen);
+  set('btnMiniClear', t.miniClear);
+  set('captionSizeLabel', t.fontSize);
+
+  // 팝업 내용 언어 업데이트
+  if (t.welcomeTitle) {
+    const titleEl = document.querySelector('.welcome-title');
+    if (titleEl) titleEl.innerHTML = t.welcomeTitle.replace('\n', '<br>');
+    const subtitleEl = document.querySelector('.welcome-subtitle');
+    if (subtitleEl) subtitleEl.innerHTML = t.welcomeSubtitle;
+    if (document.getElementById('welcomeCloseBtn'))
+      document.getElementById('welcomeCloseBtn').textContent = isHelpMode ? t.closeBtn : t.startBtn;
+
+    const simpleEl = document.getElementById('welcomeSimple');
+    if (simpleEl && t.features) {
+      simpleEl.innerHTML = t.features.map(([icon, title, desc]) =>
+        '<div class="welcome-feature"><span class="welcome-feature-icon">' + icon + '</span><div class="welcome-feature-text"><div class="welcome-feature-title">' + title + '</div><div class="welcome-feature-desc">' + desc + '</div></div></div>'
+      ).join('');
+    }
+    const detailEl = document.getElementById('welcomeDetail');
+    if (detailEl && t.detailFeatures) {
+      detailEl.innerHTML = t.detailFeatures.map(([icon, title, desc]) =>
+        '<div class="welcome-feature"><span class="welcome-feature-icon">' + icon + '</span><div class="welcome-feature-text"><div class="welcome-feature-title">' + title + '</div><div class="welcome-feature-desc">' + desc + '</div></div></div>'
+      ).join('');
+    }
+    const warnEl = document.querySelector('.welcome-warning .welcome-warning-text');
+    if (warnEl && t.warningText) warnEl.textContent = t.warningText;
+  }
+
   // 안드로이드 경고 문구 업데이트
   if (t.androidWarningCaption) {
     const warnMini = document.getElementById('androidWarningMini');
@@ -3691,7 +3800,20 @@ function setFont(size) {
   const savedFont   = localStorage.getItem('fontSize') || 'sm';
   const savedVoice  = localStorage.getItem('voiceEnabled') || 'off';
   const savedEmoji  = localStorage.getItem('emojiMode');
-  const savedLang   = localStorage.getItem('lang') || 'ko';
+
+  // 저장된 언어가 없으면 기기 언어 자동 감지
+  let savedLang = localStorage.getItem('lang');
+  if (!savedLang) {
+    const deviceLang = (navigator.language || navigator.userLanguage || 'ko').toLowerCase();
+    if (deviceLang.startsWith('ko')) savedLang = 'ko';
+    else if (deviceLang.startsWith('ja')) savedLang = 'ja';
+    else if (deviceLang.startsWith('zh')) savedLang = 'zh';
+    else if (deviceLang.startsWith('es')) savedLang = 'es';
+    else if (deviceLang.startsWith('fr')) savedLang = 'fr';
+    else if (deviceLang.startsWith('de')) savedLang = 'de';
+    else if (deviceLang.startsWith('en')) savedLang = 'en';
+    else savedLang = 'ko'; // 지원 안 되는 언어는 한국어 기본값
+  }
 
   setLang(savedLang);
   setFont(savedFont);
